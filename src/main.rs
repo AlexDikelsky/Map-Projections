@@ -3,8 +3,6 @@ use std::iter;
 
 const PI: f64 = 3.1415926;
 
-// If you 
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let root = BitMapBackend::new("map.png", (1024, 768)).into_drawing_area();
 
@@ -17,6 +15,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let num_points = 100;
     let bound = 2.0*PI/2.0;
 
+    //Add parallels and meridians
     let mut points: Vec<(f64, f64)> = merids(num_lines, num_points);
     points.extend(pars(num_lines, num_points));
 
@@ -102,13 +101,9 @@ fn pars(num_pars: usize, num_points: usize) -> Vec<(f64, f64)> {
 // returns meridian with num points on both "sides"
 fn meridian(deg: f64, num: usize) -> Vec<(f64, f64)> {
     let lat_vals : Vec<f64> = points_between(-(PI/2.0), PI/2.0, num);
-    let mut result: Vec<(f64, f64)> = vec![];
-    (0..(num+1)).map(|x| {
-                 result.push((lat_vals[x], deg)); 
-                 result.push((lat_vals[x], deg-(PI/2.0)));
-    })
-    .count();
-    result
+    lat_vals.iter().map(|x| {
+        vec![(*x, deg), (*x, deg-(PI/2.0))]
+    }).flatten().collect()
     //(0..num).map(|x| 
     //             ((this_side[x], deg), (other_side[x], deg)))
     //    .flatten().collect()
