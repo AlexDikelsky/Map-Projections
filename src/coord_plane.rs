@@ -5,6 +5,12 @@ pub fn sphere_coords(num_lines: usize, num_points: usize) -> Vec<(f64, f64)> {
         pars(num_lines, num_points)).collect()
 }
 
+pub fn polar_to_cartesian(point: (f64, f64)) -> (f64, f64) {
+    let (rho, theta) = point;
+    (rho*theta.sin(), -rho*theta.cos())
+}
+    
+
 fn merids(num_merids: usize, num_points: usize) -> Vec<(f64, f64)> {
     points_between(0.0, PI/2.0, num_points)
         .iter().copied()

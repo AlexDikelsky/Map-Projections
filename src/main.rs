@@ -14,13 +14,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //π/2 are plotted for symmetry
     let num_lines = 4;
     let num_points = 100;
-    let bound = 2.0*PI/2.0;
+    let bound = PI;
 
     //Add parallels and meridians
     let mut points: Vec<(f64, f64)> = coord_plane::sphere_coords(num_lines, num_points);
 
     //Change the function called here to remap
-    points = projections::equidistant_conic(&points);
+    //points = projections::mercator(&points);
+    points = projections::bonne(&points, PI/2.0);
 
     let mut scatter_ctx = ChartBuilder::on(&root)
         .x_label_area_size(40)
