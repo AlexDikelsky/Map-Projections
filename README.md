@@ -5,3 +5,7 @@ the lines that are marked by comments in the `main.rs` file. To add
 projections, add more mappings in the `projections.rs` file.
 
 Output is stored in a file called `map.png` relative to the current directory.
+
+Examples are stored in the `maps` directory. By chaining together map projections,
+interesting visuals can be created, such as the "map" shown in 
+`maps/mercator-bonne-simple_equidistant_conic.png`

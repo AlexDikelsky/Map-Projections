@@ -1,9 +1,25 @@
 use super::coord_plane::points_between_exclusive;
 
-//pub fn polygon(corners: Vec<(f64, f64)>, num_points: usize) -> Vec<(f64, f64)> {
-//}
+//Takes list of pairs, and draws lines from the first pair to the second, and so on
+//The last pair connects back to the first pair
+pub fn connect_lines(corners: Vec<(f64, f64)>, num_points: usize) -> Vec<(f64, f64)> {
 
-pub fn line_exclusive(a: (f64, f64), b: (f64, f64), num_points: usize) -> Vec<(f64, f64)> {
+    //Normal order
+    corners.iter() 
+
+        //Same order, but one "ahead"
+        .zip(corners.iter().cycle().skip(1)) 
+
+        .map(|(start, end)| 
+
+             //Connect the lines from n to n+1 in the list, starting over from 0
+             //if it goes out of bounds
+             line_exclusive(*start, *end, num_points)).flatten()
+        .collect()
+}
+
+
+fn line_exclusive(a: (f64, f64), b: (f64, f64), num_points: usize) -> Vec<(f64, f64)> {
     let (a_x, a_y) = a;
     let (b_x, b_y) = b;
 
