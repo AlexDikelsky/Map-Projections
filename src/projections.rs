@@ -1,10 +1,10 @@
-use core::f64::consts::PI;
+use core::f64::consts::FRAC_PI_4;
 use super::coord_plane::polar_to_cartesian;
 
 #[allow(dead_code)]
 pub fn mercator(points: &Vec<(f64, f64)>) -> Vec<(f64, f64)> {
     points.iter().map(
-        |(x, y)| (*x, (PI/4.0 + y/2.0).tan().ln())).collect()
+        |(x, y)| (*x, (FRAC_PI_4 + y/2.0).tan().ln())).collect()
 }
 
 #[allow(dead_code)]
@@ -26,9 +26,10 @@ pub fn bonne(points: &Vec<(f64, f64)>, central_meridian: f64) -> Vec<(f64, f64)>
 }
 
 #[allow(dead_code)]
-pub fn simple_equidistant_conic(points: &Vec<(f64, f64)>) -> Vec<(f64, f64)> {
-    let phi_1: f64 = 0.0;
-    let phi_2: f64 = PI/4.0;
+pub fn simple_equidistant_conic(points: &Vec<(f64, f64)>, 
+                                standard_par1: f64, standard_par2: f64) -> Vec<(f64, f64)> {
+    let phi_1: f64 = standard_par1;
+    let phi_2: f64 = standard_par2;
 
     let temp = (phi_2 * phi_1.cos() - 
                 phi_1 * phi_2.cos())
@@ -41,6 +42,6 @@ pub fn simple_equidistant_conic(points: &Vec<(f64, f64)>) -> Vec<(f64, f64)> {
             let rho = temp - phi;
             let theta = n * lambda;
             polar_to_cartesian((rho, theta))
-        }).collect()//.map(polar_to_cartesian).collect()
+        }).collect()
 }
 

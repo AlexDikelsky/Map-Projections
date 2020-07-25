@@ -1,27 +1,33 @@
 use plotters::prelude::*;
 use core::f64::consts::PI;
+use core::f64::consts::FRAC_PI_2;
 
 mod projections;
 mod coord_plane;
+mod shapes;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+
     let root = BitMapBackend::new("map.png", (1024, 768)).into_drawing_area();
 
     root.fill(&WHITE)?;
 
-    //Modify number of lines here
-    //You will always see one more line than you put here because both -π/2 and
-    //π/2 are plotted for symmetry
-    let num_lines = 4;
+    //num_lines changes number of parallels and meridians
+    let num_lines = 5;
+    //num_points changes how many points are plotted on each meridian
     let num_points = 100;
+    //Size of the graph. For Mercator projection, should be larger
     let bound = PI;
 
     //Add parallels and meridians
     let mut points: Vec<(f64, f64)> = coord_plane::sphere_coords(num_lines, num_points);
 
-    //Change the function called here to remap
+    // *******************************************
+    // Change the function called here to remap
+    // *******************************************
     //points = projections::mercator(&points);
-    points = projections::bonne(&points, PI/2.0);
+    //points = projections::bonne(&points, FRAC_PI_2);
+    points = projections::simple_equidistant_conic(&points, (FRAC_PI_2) * (3.0/4.0), FRAC_PI_2 * (1.0/4.0));
 
     let mut scatter_ctx = ChartBuilder::on(&root)
         .x_label_area_size(40)
