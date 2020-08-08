@@ -8,7 +8,7 @@ pub struct Circle {
 }
 
 impl Circle {
-    fn make_circular_points(&self) -> Vec<(f64, f64)> {
+    pub fn make_circular_points(&self) -> Vec<(f64, f64)> {
         points_between_exclusive(0.0, 2.0 * PI, self.num_points).iter()
             .map(|x|
                 (self.center.0 + (self.radius * x.cos()),
@@ -16,21 +16,34 @@ impl Circle {
                 .collect()
     }
 
-
-    fn project(&self, projection_fn: Box<Fn(&Vec<(f64, f64)>) -> Vec<(f64, f64)>>)
-            -> Vec<(f64, f64)> {
-        projection_fn(&self.make_circular_points())
+    pub fn project(&mut self) -> Vec<(f64, f64)> {
+        self.center = super::projections::mercator(&vec![self.center])[0];
+        super::projections::mercator(&self.make_circular_points())
     }
 
     // This function pushes points further away from the radius
     // This is needed for drawing the tissot indicatrices, because the circle is supposed
     // to be infinitismal, then expanded for viewing rather than just a large circle
     // in the first place
-    pub fn expand_to_indicatrix(&self, projection_fn: Box<Fn(&Vec<(f64, f64)>) -> Vec<(f64, f64)>>,
-            increase_ratio: f64) -> Vec<(f64, f64)> {
-        self.project(projection_fn).iter().map(
+    pub fn expand_to_indicatrix(&mut self, increase_ratio: f64) -> Vec<(f64, f64)> {
+        self.project().iter().map(
             |p| self.extend_line(*p, increase_ratio)).collect()
     }
+
+    //fn project(&self, projection_fn: Box<Fn(&Vec<(f64, f64)>) -> Vec<(f64, f64)>>)
+    //        -> Vec<(f64, f64)> {
+    //    projection_fn(&self.make_circular_points())
+    //}
+
+    //// This function pushes points further away from the radius
+    //// This is needed for drawing the tissot indicatrices, because the circle is supposed
+    //// to be infinitismal, then expanded for viewing rather than just a large circle
+    //// in the first place
+    //pub fn expand_to_indicatrix(&self, projection_fn: Box<Fn(&Vec<(f64, f64)>) -> Vec<(f64, f64)>>,
+    //        increase_ratio: f64) -> Vec<(f64, f64)> {
+    //    self.project(projection_fn).iter().map(
+    //        |p| self.extend_line(*p, increase_ratio)).collect()
+    //}
             
     fn extend_line(&self, radius_point: (f64, f64), increase_ratio: f64) -> (f64, f64) {
         let x_diff = radius_point.0 - self.center.0;
