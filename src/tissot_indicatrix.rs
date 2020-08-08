@@ -7,7 +7,7 @@ pub fn gen_indicatrices(num_lines: usize, num_points: usize) -> Vec<(f64, f64)> 
         .map(|p| 
              Circle { 
                  center: *p,
-                 radius: super::INDICATRICE_SIZE,
+                 radius: super::INDICATRIX_SIZE,
                  num_points: num_points,
              }.expand_to_indicatrix(80.0)
              ).flatten().collect()
@@ -18,7 +18,7 @@ pub fn circles(num_lines: usize, num_points: usize) -> Vec<(f64, f64)> {
         .map(|p| 
              Circle { 
                  center: *p,
-                 radius: super::INDICATRICE_SIZE,
+                 radius: super::INDICATRIX_SIZE,
                  num_points: num_points,
              }.make_circular_points()
              ).flatten().collect()

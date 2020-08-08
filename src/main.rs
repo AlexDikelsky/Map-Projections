@@ -7,7 +7,7 @@ mod coord_plane;
 mod shapes;
 mod tissot_indicatrix;
 
-const INDICATRICE_SIZE: f64 = 0.001;
+const INDICATRIX_SIZE: f64 = 0.001;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
@@ -25,6 +25,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //Add parallels and meridians
     let mut points: Vec<(f64, f64)> = coord_plane::sphere_coords(num_lines, num_points);
 
+    //****************************
+    //Set mapping function here
+    //****************************
+    // If the function takes more than one argument, define them before this line
+    let modified_map = |vals| 
+        projections::simple_equidistant_conic(vals, FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0));
+        //projections::bonne(vals, FRAC_PI_2);
+
+    let mapping_function = modified_map;
+
 
     //***
     //Add shapes here to see distortion
@@ -41,13 +51,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //**** Circle
     //points.extend(shapes::circle((-1.0, 1.0), 2.0, 100));
 
-    // *******************************************
-    // Change the function called here to remap
-    // Running one at a time produces that type of projection
-    // *******************************************
-    points = projections::mercator(&points);
-    //points = projections::bonne(&points, FRAC_PI_2);
-    //points = projections::simple_equidistant_conic(&points, FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0));
+
+    points = mapping_function(&points);
     let indic = tissot_indicatrix::circles(num_lines, num_points);
 
     //points = projections::mercator(&indic);
