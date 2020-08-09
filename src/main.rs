@@ -7,7 +7,7 @@ mod coord_plane;
 mod shapes;
 mod tissot_indicatrix;
 
-const INDICATRIX_SIZE: f64 = 0.001;
+const INDICATRIX_SIZE: f64 = 0.00001;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
@@ -29,15 +29,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //Set mapping function here
     //****************************
     // If the function takes more than one argument, define them before this line
-    let modified_map: 
-        //Box<dyn for<'r> std::ops::Fn(&'r std::vec::Vec<(f64, f64)>) -> std::vec::Vec<(f64, f64)>>
-        Box<dyn std::ops::Fn(std::vec::Vec<(f64, f64)>) -> std::vec::Vec<(f64, f64)>>
-        = 
+    let mapping_function: Box<dyn std::ops::Fn(std::vec::Vec<(f64, f64)>) -> std::vec::Vec<(f64, f64)>> = 
         //Box::new(|vals| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
         //Box::new(|vals| projections::bonne(vals, FRAC_PI_2));
-        Box::new(projections::sinusoidal);
-
-    let mapping_function = modified_map;
+        Box::new(projections::mercator);
 
     //***
     //Add shapes here to see distortion

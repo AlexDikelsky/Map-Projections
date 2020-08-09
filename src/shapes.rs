@@ -11,12 +11,14 @@ impl Circle {
 
 
     //Vec of points and the center of the circle
-    pub fn make_circular_points(&self) -> (Vec<(f64, f64)>, (f64, f64)) {
-        (points_between_exclusive(0.0, 2.0 * PI, self.num_points).iter()
+    pub fn to_indicatrix(&self) -> super::tissot_indicatrix::Indicatrix {
+        super::tissot_indicatrix::Indicatrix {points: points_between_exclusive(0.0, 2.0 * PI, self.num_points).iter()
             .map(|x|
                 (self.center.0 + (self.radius * x.cos()),
                  self.center.1 + (self.radius * x.sin())))
-                .collect(), self.center)
+                .collect(), 
+            center: self.center,
+        }
     }
 
 
