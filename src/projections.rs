@@ -2,13 +2,13 @@ use core::f64::consts::FRAC_PI_4;
 use super::coord_plane::polar_to_cartesian;
 
 #[allow(dead_code)]
-pub fn mercator(points: &Vec<(f64, f64)>) -> Vec<(f64, f64)> {
+pub fn mercator(points: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
     points.iter().map(
         |(x, y)| (*x, (FRAC_PI_4 + y/2.0).tan().ln())).collect()
 }
 
 #[allow(dead_code)]
-pub fn bonne(points: &Vec<(f64, f64)>, central_meridian: f64) -> Vec<(f64, f64)> {
+pub fn bonne(points: Vec<(f64, f64)>, central_meridian: f64) -> Vec<(f64, f64)> {
     //Technically around for a long time before Boone
     //Based off Werner's cordiform projections, which was based off
     //of Ptolemey's second projection
@@ -26,7 +26,7 @@ pub fn bonne(points: &Vec<(f64, f64)>, central_meridian: f64) -> Vec<(f64, f64)>
 }
 
 #[allow(dead_code)]
-pub fn simple_equidistant_conic(points: &Vec<(f64, f64)>, 
+pub fn simple_equidistant_conic(points: Vec<(f64, f64)>, 
                                 standard_par1: f64, standard_par2: f64) -> Vec<(f64, f64)> {
     let phi_1: f64 = standard_par1;
     let phi_2: f64 = standard_par2;
@@ -45,3 +45,8 @@ pub fn simple_equidistant_conic(points: &Vec<(f64, f64)>,
         }).collect()
 }
 
+#[allow(dead_code)]
+pub fn sinusoidal(points: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
+    points.iter().map(|(lambda, phi)|
+                      (lambda * phi.cos(), *phi)).collect()
+}

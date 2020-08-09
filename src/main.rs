@@ -29,12 +29,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //Set mapping function here
     //****************************
     // If the function takes more than one argument, define them before this line
-    let modified_map = |vals| 
-        projections::simple_equidistant_conic(vals, FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0));
-        //projections::bonne(vals, FRAC_PI_2);
+    let modified_map: 
+        //Box<dyn for<'r> std::ops::Fn(&'r std::vec::Vec<(f64, f64)>) -> std::vec::Vec<(f64, f64)>>
+        Box<dyn std::ops::Fn(std::vec::Vec<(f64, f64)>) -> std::vec::Vec<(f64, f64)>>
+        = 
+        //Box::new(|vals| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
+        //Box::new(|vals| projections::bonne(vals, FRAC_PI_2));
+        Box::new(projections::sinusoidal);
 
     let mapping_function = modified_map;
-
 
     //***
     //Add shapes here to see distortion
@@ -52,12 +55,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //points.extend(shapes::circle((-1.0, 1.0), 2.0, 100));
 
 
-    points = mapping_function(&points);
-    let indic = tissot_indicatrix::circles(num_lines, num_points);
-
-    //points = projections::mercator(&indic);
-
-    //points.extend(projections::mercator(&indic));
+    //points = mapping_function(points);
+    let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points);
+    points = indic;
 
     let mut scatter_ctx = ChartBuilder::on(&root)
         .x_label_area_size(40)
