@@ -5,6 +5,7 @@ use core::f64::consts::FRAC_PI_2;
 mod projections;
 mod coord_plane;
 mod shapes;
+mod circle;
 mod tissot_indicatrix;
 
 const INDICATRIX_SIZE: f64 = 0.00001;
@@ -49,12 +50,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //            (1.0, 1.0),
     //            (0.0, 1.0),
     //        ], 500));
-    //**** Circle
-    //points.extend(shapes::circle((-1.0, 1.0), 2.0, 100));
 
-
+    let area_to_check = 0.4;
+    let threshold = 0.02;
     points = mapping_function(points);
-    let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points);
+    let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points,
+        area_to_check, threshold);
 
     let mut scatter_ctx = ChartBuilder::on(&root)
         .x_label_area_size(40)

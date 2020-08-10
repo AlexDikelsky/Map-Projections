@@ -1,6 +1,6 @@
 use core::f64::consts::FRAC_PI_2;
 use super::coord_plane::points_between_inclusive;
-use super::shapes::Circle;
+use super::circle::Circle;
 
 pub struct Indicatrix {
     pub center: (f64, f64),
@@ -26,14 +26,14 @@ impl Indicatrix {
 }
 
 
-pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<(f64, f64)>) -> Vec<(f64,f64)>>, num_lines: usize, num_points: usize) -> Vec<(f64, f64)> {
+pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<(f64, f64)>) -> Vec<(f64,f64)>>, num_lines: usize, num_points: usize, area_to_check: f64, threshold: f64) -> Vec<(f64, f64)> {
     intersections_of_pars_and_merids(num_lines).iter()
         .map(|p| 
              Circle { 
                  center: *p,
                  radius: super::INDICATRIX_SIZE,
                  num_points: num_points,
-             }.to_indicatrix().project(&mapping_function)
+             }.to_indicatrix(num_points, area_to_check, threshold).project(&mapping_function)
              .expand(5.0))
     .flatten().collect()
 }
