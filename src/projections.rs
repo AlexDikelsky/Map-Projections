@@ -50,3 +50,29 @@ pub fn sinusoidal(points: Vec<(f64, f64)>) -> Vec<(f64, f64)> {
     points.iter().map(|(lambda, phi)|
                       (lambda * phi.cos(), *phi)).collect()
 }
+
+#[allow(dead_code)]
+pub fn lambert_conformal_conic(points: Vec<(f64, f64)>, 
+                                standard_par1: f64, standard_par2: f64) -> Vec<(f64, f64)> {
+    let phi_1 = standard_par1;
+    let phi_2 = standard_par2;
+
+    let n = (
+            (phi_1.cos().ln() -
+            phi_2.cos().ln()) 
+        ) / (
+            (FRAC_PI_4 + phi_2).tan().ln() -
+            (FRAC_PI_4 + phi_1));
+
+    points.iter().map(
+        |(lambda, phi)| {
+            let theta = n * lambda;
+            let rho = 
+                phi_1.cos() *
+                (FRAC_PI_4 + phi_1/2.0).tan().powf(n)
+                /
+                (n * (FRAC_PI_4 + phi/2.0).tan().powf(n));
+            polar_to_cartesian((rho, theta))
+        }).collect()
+}
+

@@ -1,7 +1,9 @@
 use super::coord_plane::points_between_exclusive;
+use super::coord_plane::great_circle_dist;
 use core::f64::consts::PI;
 use core::f64::consts::FRAC_PI_2;
-const spots_to_check: usize = 100;
+use core::f64::consts::FRAC_PI_8;
+const SPOTS_TO_CHECK: usize = 1000;
 
 pub struct Circle {
     pub center: (f64, f64),
@@ -33,8 +35,6 @@ impl Circle {
                 //    acos(sin(φ1)sin(φ2) + cos(φ1)cos(φ2)cos(|λ1-λ2|)
 
                 let sigma = self.radius;
-                let lambda_2 = self.center.0;
-                let phi_2 = self.center.1;
 
                 //Idea is this:
                 //if (rand_point statisfies 
@@ -42,36 +42,23 @@ impl Circle {
                 //    add point
                 //}
 
-                let max_dist = 1.0;
+                let area_from_center = FRAC_PI_8;
 
-                let lat_bound = (lambda_2 - max_dist, lambda_2 + max_dist);
-                let lon_bound = (phi_2 - max_dist, phi_2 + max_dist);
+                let diff_between_angle_and_calculated = 0.02;
 
-                let guess_points:
-                    Vec<(f64, f64)> = 
-                        points_between_exclusive(lat_bound.0, lat_bound.1, spots_to_check).iter().map(
-                        |x| {
-                            points_between_exclusive(lon_bound.0, lon_bound.1, spots_to_check).iter().map(
-                            |y| (*x, *y) // tuple
-                            ).collect::<Vec<(f64,f64)>>()  // finish first iterator
-                        }
-                    ).flatten().collect();
-
-                guess_points.iter().filter(
-                    |(lambda_1, phi_1)| {
-                    
-                        //dbg!(sigma, 
-                        //        (phi_1.sin() * phi_2.sin() + 
-                        //    phi_1.cos() * phi_2.cos() * (**lambda_1 - lambda_2).abs().cos()).acos());
-
+                let res: Vec<(f64, f64)>
+                    = gen_guess_points(self.center, SPOTS_TO_CHECK, area_from_center).iter().filter(
+                    |test_point| {
                         f64_in_tolerance(
-                            sigma, (
-                            phi_1.sin() * phi_2.sin() + 
-                            phi_1.cos() * phi_2.cos() * (*lambda_1 - lambda_2).abs().cos()
-                            ).acos(),
-                            10.0)
+                            sigma, 
+                            great_circle_dist(**test_point, self.center),
+                            diff_between_angle_and_calculated)
                     })
-                    .map(|(x,y)| (*x,*y)).collect()
+                    .map(|(x,y)| (*x,*y)).collect();
+
+                println!("res: {}", &res.len());
+                res
+
             },
             center: self.center,
         }
@@ -79,6 +66,22 @@ impl Circle {
     }
 
 }
+
+fn gen_guess_points(start_point: (f64, f64), points_to_check: usize, tolerance: f64) -> Vec<(f64, f64)> {
+    let lat_bound = (start_point.1 - tolerance, start_point.1 + tolerance);
+    let lon_bound = (start_point.0 - tolerance, start_point.0 + tolerance);
+
+    println!("{:?}, {:?}", lat_bound, lon_bound);
+
+    points_between_exclusive(lat_bound.0, lat_bound.1, points_to_check).iter().map(
+        |x| {
+            points_between_exclusive(lon_bound.0, lon_bound.1, points_to_check).iter().map(
+            |y| (*y, *x)
+            ).collect::<Vec<(f64,f64)>>()
+        }
+    ).flatten().collect()
+}
+
 
 fn f64_in_tolerance(num1: f64, num2: f64, tolerance: f64) -> bool {
     (num1-num2).abs() < tolerance

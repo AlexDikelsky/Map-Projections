@@ -34,7 +34,7 @@ pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<(f64, f64)>) -> Vec<(f6
                  radius: super::INDICATRIX_SIZE,
                  num_points: num_points,
              }.to_indicatrix().project(&mapping_function)
-             .expand(5000.0))
+             .expand(5.0))
     .flatten().collect()
 }
 

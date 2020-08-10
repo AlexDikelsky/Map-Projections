@@ -9,7 +9,25 @@ pub fn polar_to_cartesian(point: (f64, f64)) -> (f64, f64) {
     let (rho, theta) = point;
     (rho*theta.sin(), -rho*theta.cos())
 }
-    
+
+pub fn great_circle_dist(start: (f64, f64), end: (f64, f64)) -> f64 {
+    let (lambda_1, phi_1) = start;
+    let (lambda_2, phi_2) = end;
+
+    let delta_lambda = (lambda_1 - lambda_2).abs();
+
+    (phi_1.sin() * phi_2.sin() + 
+    phi_1.cos() * phi_2.cos() * delta_lambda.cos()
+    ).acos()
+}
+
+//Alternate calculation
+//2.0 * ((delta_phi/2.0).sin().powi(2)
+//       + phi_1.cos() * phi_2.cos() * 
+//           (delta_lambda/2.0).cos().powi(2)).sqrt().asin(),
+
+
+
 
 //num points between min and max, exclusive
 // works with min>max, but goes backward
