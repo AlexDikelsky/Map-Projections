@@ -1,24 +1,22 @@
 use core::f64::consts::FRAC_PI_2;
 use super::coord_plane::points_between_inclusive;
 use super::circle::Circle;
+use super::coord_plane::LatLonPoint;
+use super::coord_plane::CartPoint;
 
 pub struct Indicatrix {
-    pub center: (f64, f64),
-    pub points: Vec<(f64, f64)>,
+    pub center: LatLonPoint,
+    pub points: Vec<LatLonPoint>,
 }
 
-impl Indicatrix {
+struct CartPointsWithCenter {
+    pub center: CartPoint,
+    pub points: Vec<CartPoint>,
+}
 
-    // Transform according to projection
-    pub fn project(self, mapping_function: &Box<dyn Fn(Vec<(f64, f64)>) -> Vec<(f64,f64)>>) -> Self {
-        Indicatrix {
-            points: mapping_function(self.points),
-            center: mapping_function(vec![self.center])[0],
-        }
-    }
-
+impl CartPointsWithCenter {
     // This function pushes points further away from the radius
-    pub fn expand(self, increase_ratio: f64) -> Vec<(f64, f64)> {
+    pub fn expand(self, increase_ratio: f64) -> Vec<CartPoint> {
         self.points.iter().map(
             |end| extend_line(self.center, *end, increase_ratio)
             ).collect()
@@ -26,7 +24,20 @@ impl Indicatrix {
 }
 
 
-pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<(f64, f64)>) -> Vec<(f64,f64)>>, num_lines: usize, num_points: usize, area_to_check: f64, threshold: f64) -> Vec<(f64, f64)> {
+impl Indicatrix {
+
+    // Transform according to projection
+    fn project(self, mapping_function: &Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>) -> CartPointsWithCenter {
+        CartPointsWithCenter {
+            points: mapping_function(self.points),
+            center: mapping_function(vec![self.center])[0],
+        }
+    }
+
+}
+
+
+pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>, num_lines: usize, num_points: usize, area_to_check: f64, threshold: f64) -> Vec<CartPoint> {
     intersections_of_pars_and_merids(num_lines).iter()
         .map(|p| 
              Circle { 
@@ -38,18 +49,21 @@ pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<(f64, f64)>) -> Vec<(f6
     .flatten().collect()
 }
 
-fn intersections_of_pars_and_merids(num_lines: usize) -> Vec<(f64, f64)> {
+fn intersections_of_pars_and_merids(num_lines: usize) -> Vec<LatLonPoint> {
     points_between_inclusive(-FRAC_PI_2, FRAC_PI_2, num_lines).iter()
         .map(|x: &f64| points_between_inclusive(-FRAC_PI_2, FRAC_PI_2, num_lines).iter()
-             .map(|y: &f64| (*x, *y)).collect::<Vec<(f64, f64)>>())
+             .map(|y: &f64| 
+                  LatLonPoint { lambda: *x, phi: *y } 
+                  ).collect::<Vec<LatLonPoint>>())
         .flatten().collect()
 }
 
 
-fn extend_line(start: (f64, f64), end: (f64, f64), increase_ratio: f64) -> (f64, f64) {
-    let x_diff = end.0 - start.0;
-    let y_diff = end.1 - start.1;
-    (start.0 + x_diff * increase_ratio,
-     start.1 + y_diff * increase_ratio,
-     )
+fn extend_line(start: CartPoint, end: CartPoint, increase_ratio: f64) -> CartPoint {
+    let x_diff = end.x - start.x;
+    let y_diff = end.y - start.y;
+    CartPoint {
+        x: start.x + x_diff * increase_ratio,
+        y: start.y + y_diff * increase_ratio,
+    }
 }

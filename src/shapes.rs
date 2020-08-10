@@ -7,6 +7,7 @@ use core::f64::consts::FRAC_PI_8;
 
 //Takes list of pairs, and draws lines from the first pair to the second, and so on
 //The last pair connects back to the first pair
+#[allow(dead_code)]
 pub fn connect_lines(corners: Vec<(f64, f64)>, num_points: usize) -> Vec<(f64, f64)> {
 
     //Normal order
@@ -23,6 +24,7 @@ pub fn connect_lines(corners: Vec<(f64, f64)>, num_points: usize) -> Vec<(f64, f
         .collect()
 }
 
+#[allow(dead_code)]
 fn line_exclusive(a: (f64, f64), b: (f64, f64), num_points: usize) -> Vec<(f64, f64)> {
     let (a_x, a_y) = a;
     let (b_x, b_y) = b;
