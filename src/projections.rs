@@ -2,6 +2,7 @@ use core::f64::consts::FRAC_PI_4;
 use super::coord_plane::PolarPoint;
 use super::coord_plane::LatLonPoint;
 use super::coord_plane::CartPoint;
+use super::coord_plane::great_circle_dist;
 
 #[allow(dead_code)]
 pub fn mercator(points: Vec<LatLonPoint>) -> Vec<CartPoint> {
@@ -51,6 +52,16 @@ pub fn simple_equidistant_conic(points: Vec<LatLonPoint>,
 }
 
 #[allow(dead_code)]
+pub fn equirectangular(points: Vec<LatLonPoint>) -> Vec<CartPoint> {
+    points.iter().map(
+        |llpoint| CartPoint {
+            x: llpoint.lambda,
+            y: llpoint.phi,
+        }
+        ).collect()
+}
+
+#[allow(dead_code)]
 pub fn sinusoidal(points: Vec<LatLonPoint>) -> Vec<CartPoint> {
     points.iter().map(|llpoint|
                       CartPoint { 
@@ -84,3 +95,41 @@ pub fn lambert_conformal_conic(points: Vec<LatLonPoint>,
         }).collect()
 }
 
+//#[allow(dead_code)]
+//pub fn lambert_azimuthal_equal_area(points: Vec<LatLonPoint>, center_lat: f64) -> Vec<CartPoint> {
+//    let phi_1 = center_lat;
+//
+//    points.iter().map(
+//        |llpoint| {
+//            let sin_phi = llpoint.phi.sin();
+//            let sin_phi_1 = phi_1.sin();
+//            let sin_lambda = llpoint.lambda.sin();
+//            let cos_phi = llpoint.phi.cos();
+//            let cos_phi_1 = phi_1.cos();
+//            let cos_lambda = llpoint.lambda.cos();
+//
+//            let z = (sin_phi_1 * sin_phi + 
+//                cos_phi_1 * cos_phi * cos_lambda).acos();
+//
+//            //Check vs sin_theta
+//            let cos_theta =
+//                (cos_phi_1 * sin_phi - sin_phi_1 * cos_phi * cos_lambda)
+//                / (z.sin());
+//
+//            let sin_theta = 
+//                cos_phi * sin_lambda / z.sin();
+
+
+
+    
+
+//Broken
+//pub fn stereographic(points: Vec<LatLonPoint>) -> Vec<CartPoint> {
+//    points.iter().map(
+//        |llpoint| {
+//            let rho = (llpoint.lambda / 2.0).tan().recip();
+//            let theta = llpoint.phi;
+//
+//            PolarPoint { rho, theta }.to_cart()
+//        }).collect()
+//}

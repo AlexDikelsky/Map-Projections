@@ -13,6 +13,8 @@ use coord_plane::CartPoint;
 use coord_plane::LatLonPoint;
 
 const INDICATRIX_SIZE: f64 = 0.00001;
+const GEN_INDIC: bool = false;
+
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
@@ -38,9 +40,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         //Box::new(|vals| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
         //Box::new(|vals| projections::bonne(vals, FRAC_PI_2));
         //Box::new(projections::mercator);
-        //Box::new(|x| x);   // Equirectagular
-        Box::new(projections::sinusoidal);
+        Box::new(projections::equirectangular); 
+        //Box::new(projections::sinusoidal);
         //Box::new(|vals| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
+        //Box::new(projections::stereographic);
 
     //***
     //Add shapes here to see distortion
@@ -55,11 +58,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //            (0.0, 1.0),
     //        ], 500));
 
-    let area_to_check = 0.4;
-    let threshold = 0.02;
-    let mapped_points = mapping_function(lat_lon_points);
-    let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points,
-        area_to_check, threshold);
 
     let mut scatter_ctx = ChartBuilder::on(&root)
         .x_label_area_size(40)
@@ -70,15 +68,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .disable_x_mesh()
         .disable_y_mesh()
         .draw()?;
+
+
+    let mapped_points = mapping_function(lat_lon_points);
+
+
     scatter_ctx.draw_series(
         mapped_points
             .iter()
             .map(|point| Circle::new(point.to_tuple(), 2, BLACK.filled())),
     )?;
-    scatter_ctx.draw_series(
-        indic.iter()
-            .map(|point| Circle::new(point.to_tuple(), 2, RED.filled()))
-            )?;
+
+
+    if GEN_INDIC {
+        let area_to_check = 0.4;
+        let threshold = 0.02;
+        let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points,
+            area_to_check, threshold);
+        scatter_ctx.draw_series(
+            indic.iter()
+                .map(|point| Circle::new(point.to_tuple(), 2, RED.filled()))
+                )?;
+    }
 
     Ok(())
 }

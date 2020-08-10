@@ -33,6 +33,12 @@ impl CartPoint {
     }
 }
 
+impl LatLonPoint {
+    pub fn dist_to(&self, other: &LatLonPoint) -> f64 {
+        great_circle_dist(*self, *other) 
+    }
+}
+
 
 
 pub fn sphere_coords(num_lines: usize, num_points: usize) -> Vec<LatLonPoint> {
@@ -74,8 +80,9 @@ fn merids(num_merids: usize, num_points: usize) -> Vec<LatLonPoint> {
 
 fn pars(num_pars: usize, num_points: usize) -> Vec<LatLonPoint> {
     merids(num_pars, num_points).iter().map(|point| 
-                                            LatLonPoint { lambda: point.lambda, 
-                                                phi: point.phi }).collect()
+                                            // Swap lambda and phi for merids
+                                            LatLonPoint { lambda: point.phi, 
+                                                phi: point.lambda }).collect()
 }
 
 // takes radian degree between 0 and π/2
