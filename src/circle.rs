@@ -41,6 +41,8 @@ impl Circle {
 
                 let sigma = self.radius;
 
+                dbg!(self.center);
+
                 //Idea is this:
                 //if (rand_point statisfies 
                 //    angle == acos(sin(φ1)sin(φ2) + cos(φ1)cos(φ2)cos(|λ1-λ2|))) {

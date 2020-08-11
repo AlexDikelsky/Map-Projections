@@ -1,5 +1,5 @@
 use core::f64::consts::FRAC_PI_2;
-use super::coord_plane::points_between_inclusive;
+use super::coord_plane::points_between_exclusive_both_ends;
 use super::circle::Circle;
 use super::coord_plane::LatLonPoint;
 use super::coord_plane::CartPoint;
@@ -50,8 +50,8 @@ pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<LatLonPoint>) -> Vec<Ca
 }
 
 fn intersections_of_pars_and_merids(num_lines: usize) -> Vec<LatLonPoint> {
-    points_between_inclusive(-FRAC_PI_2, FRAC_PI_2, num_lines).iter()
-        .map(|x: &f64| points_between_inclusive(-FRAC_PI_2, FRAC_PI_2, num_lines).iter()
+    points_between_exclusive_both_ends(-FRAC_PI_2, FRAC_PI_2, num_lines-2).iter()
+        .map(|x: &f64| points_between_exclusive_both_ends(-FRAC_PI_2, FRAC_PI_2, num_lines-2).iter()
              .map(|y: &f64| 
                   LatLonPoint { lambda: *x, phi: *y } 
                   ).collect::<Vec<LatLonPoint>>())

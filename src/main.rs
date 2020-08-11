@@ -6,10 +6,11 @@ mod tissot_indicatrix;
 
 use plotters::prelude::*;
 
-#[allow(unused_imports)]
 use core::f64::consts::PI;
 use core::f64::consts::FRAC_PI_2;
+use core::f64::consts::FRAC_PI_4;
 use coord_plane::CartPoint;
+use coord_plane::map_one_point;
 use coord_plane::LatLonPoint;
 
 const INDICATRIX_SIZE: f64 = 0.00001;
@@ -26,8 +27,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let num_lines = 7;
     //num_points changes how many points are plotted on each meridian
     let num_points = 1000;
-    //Size of the graph. For Mercator projection, should be larger
-    let bound = 4.0;
+    //Size of the graph.
+    //set guess_bound to true if you want it to be guessed based off the 
+    //bounds of the projection with bound as an extenstion
+    let guess_bound = true;
+    let bound = 0.5;
 
     //Add parallels and meridians
     let lat_lon_points: Vec<LatLonPoint> = coord_plane::sphere_coords(num_lines, num_points);
@@ -40,10 +44,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         //Box::new(|vals| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
         //Box::new(|vals| projections::bonne(vals, FRAC_PI_2));
         //Box::new(projections::mercator);
-        Box::new(projections::equirectangular); 
+        //Box::new(projections::equirectangular); 
         //Box::new(projections::sinusoidal);
-        //Box::new(|vals| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
+        //Box::new(|vals| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_4, PI * 12.0f64.recip()));
         //Box::new(projections::stereographic);
+        Box::new(|vals| projections::loximuthal(vals.to_vec(), 0.3 * PI));
 
     //***
     //Add shapes here to see distortion
@@ -57,12 +62,38 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //            (1.0, 1.0),
     //            (0.0, 1.0),
     //        ], 500));
+ 
+    
 
+    let upper_x;
+    let lower_x;
+    let upper_y;
+    let lower_y;
+
+    if guess_bound == true {
+         upper_y = map_one_point(&mapping_function,
+             LatLonPoint { lambda: 0.0, phi: FRAC_PI_2 }).y 
+             + bound;
+         lower_y = map_one_point(&mapping_function,
+             LatLonPoint { lambda: 0.0, phi: -FRAC_PI_2 }).y 
+             - bound;
+         upper_x = map_one_point(&mapping_function,
+             LatLonPoint { lambda: FRAC_PI_2, phi: 0.0 }).x 
+             + bound;
+         lower_x = map_one_point(&mapping_function,
+             LatLonPoint { lambda: -FRAC_PI_2, phi: 0.0 }).x 
+             - bound;
+    } else {
+         upper_x = bound;
+         lower_x = -bound;
+         upper_y = bound;
+         lower_y = -bound;
+    }
 
     let mut scatter_ctx = ChartBuilder::on(&root)
         .x_label_area_size(40)
         .y_label_area_size(40)
-        .build_ranged(-bound..bound, -bound..bound)?;
+        .build_ranged(lower_x..upper_x, lower_y..upper_y)?;
     scatter_ctx
         .configure_mesh()
         .disable_x_mesh()
@@ -82,7 +113,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if GEN_INDIC {
         let area_to_check = 0.4;
-        let threshold = 0.02;
+        let threshold = 0.01;
         let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points,
             area_to_check, threshold);
         scatter_ctx.draw_series(
