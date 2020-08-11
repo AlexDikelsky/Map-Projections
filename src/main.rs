@@ -3,6 +3,7 @@ mod coord_plane;
 mod shapes;
 mod circle;
 mod tissot_indicatrix;
+mod map_bounds;
 
 use plotters::prelude::*;
 
@@ -10,11 +11,12 @@ use core::f64::consts::PI;
 use core::f64::consts::FRAC_PI_2;
 use core::f64::consts::FRAC_PI_4;
 use coord_plane::CartPoint;
-use coord_plane::map_one_point;
 use coord_plane::LatLonPoint;
+use map_bounds::MapBounds;
+use map_bounds::BoundLocation;
 
 const INDICATRIX_SIZE: f64 = 0.00001;
-const GEN_INDIC: bool = false;
+const GEN_INDIC: bool = true;
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -31,6 +33,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //set guess_bound to true if you want it to be guessed based off the 
     //bounds of the projection with bound as an extenstion
     let guess_bound = true;
+    let force_normal = true;
     let bound = 0.5;
 
     //Add parallels and meridians
@@ -48,7 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         //Box::new(projections::sinusoidal);
         //Box::new(|vals| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_4, PI * 12.0f64.recip()));
         //Box::new(projections::stereographic);
-        Box::new(|vals| projections::loximuthal(vals.to_vec(), 0.3 * PI));
+        //Box::new(|vals| projections::loximuthal(vals.to_vec(), 0.3 * PI));
 
     //***
     //Add shapes here to see distortion
@@ -64,31 +67,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //        ], 500));
  
     
+    let bounds = MapBounds::new(
+        &mapping_function, BoundLocation::MaxXandY).add_size(bound)
+        .to_normal_vals(10.0);
 
-    let upper_x;
-    let lower_x;
-    let upper_y;
-    let lower_y;
+    let upper_x = bounds.upper_x;
+    let lower_x = bounds.lower_x;
+    let upper_y = bounds.upper_y;
+    let lower_y = bounds.lower_y;
 
-    if guess_bound == true {
-         upper_y = map_one_point(&mapping_function,
-             LatLonPoint { lambda: 0.0, phi: FRAC_PI_2 }).y 
-             + bound;
-         lower_y = map_one_point(&mapping_function,
-             LatLonPoint { lambda: 0.0, phi: -FRAC_PI_2 }).y 
-             - bound;
-         upper_x = map_one_point(&mapping_function,
-             LatLonPoint { lambda: FRAC_PI_2, phi: 0.0 }).x 
-             + bound;
-         lower_x = map_one_point(&mapping_function,
-             LatLonPoint { lambda: -FRAC_PI_2, phi: 0.0 }).x 
-             - bound;
-    } else {
-         upper_x = bound;
-         lower_x = -bound;
-         upper_y = bound;
-         lower_y = -bound;
-    }
+    dbg!(bounds);
 
     let mut scatter_ctx = ChartBuilder::on(&root)
         .x_label_area_size(40)
