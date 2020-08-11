@@ -121,6 +121,7 @@ pub fn lambert_conformal_conic(points: Vec<LatLonPoint>,
 
 
 
+#[allow(dead_code)]
 pub fn loximuthal(points: Vec<LatLonPoint>, central_lat: f64) -> Vec<CartPoint> {
     let phi_1 = central_lat;
 

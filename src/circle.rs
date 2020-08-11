@@ -30,14 +30,16 @@ impl Circle {
     // area_from_center = pi/8
     // diff... = 0.02
     pub fn to_indicatrix(&self, num_points_to_check: usize,
-                         area_from_center: f64, diff_between_angle_and_calculated: f64
-                         ) -> super::tissot_indicatrix::Indicatrix {
+                         area_from_center: f64) -> super::tissot_indicatrix::Indicatrix {
         super::tissot_indicatrix::Indicatrix {
             points: {
                 //These points all have the same great circle distance from the center
 
                 // angle from center of sphere =
                 //    acos(sin(φ1)sin(φ2) + cos(φ1)cos(φ2)cos(|λ1-λ2|)
+                //
+                // This means you can add all points where the angle is less than sigma,
+                // and get an approximation of the "right" values
 
                 let sigma = self.radius;
 
@@ -45,16 +47,11 @@ impl Circle {
 
                 //Idea is this:
                 //if (rand_point statisfies 
-                //    angle == acos(sin(φ1)sin(φ2) + cos(φ1)cos(φ2)cos(|λ1-λ2|))) {
+                //    angle > acos(sin(φ1)sin(φ2) + cos(φ1)cos(φ2)cos(|λ1-λ2|))) {
                 //    add point
                 //}
                 gen_guess_points(self.center, num_points_to_check, area_from_center).iter().filter(
-                |test_point| {
-                    f64_in_tolerance(
-                        sigma, 
-                        great_circle_dist(**test_point, self.center),
-                        diff_between_angle_and_calculated)
-                }).map(|x| *x)
+                |test_point| great_circle_dist(**test_point, self.center) < sigma).map(|x| *x)
                 .collect()
 
             },
@@ -83,6 +80,3 @@ fn gen_guess_points(start_point: LatLonPoint, points_to_check: usize, tolerance:
 }
 
 
-fn f64_in_tolerance(num1: f64, num2: f64, tolerance: f64) -> bool {
-    (num1-num2).abs() < tolerance
-}

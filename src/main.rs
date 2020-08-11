@@ -15,7 +15,6 @@ use coord_plane::LatLonPoint;
 use map_bounds::MapBounds;
 use map_bounds::BoundLocation;
 
-const INDICATRIX_SIZE: f64 = 0.00001;
 const GEN_INDIC: bool = true;
 
 
@@ -32,9 +31,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //Size of the graph.
     //set guess_bound to true if you want it to be guessed based off the 
     //bounds of the projection with bound as an extenstion
-    let guess_bound = true;
-    let force_normal = true;
-    let bound = 0.5;
+    //
+    //
+    //Note that conformal projections will have non-circular indicatrices if
+    //the bounds aren't square
+    let bound = 6.0;
 
     //Add parallels and meridians
     let lat_lon_points: Vec<LatLonPoint> = coord_plane::sphere_coords(num_lines, num_points);
@@ -46,7 +47,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mapping_function: Box<dyn std::ops::Fn(std::vec::Vec<LatLonPoint>) -> std::vec::Vec<CartPoint>> = 
         //Box::new(|vals| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
         //Box::new(|vals| projections::bonne(vals, FRAC_PI_2));
-        //Box::new(projections::mercator);
+        Box::new(projections::mercator);
         //Box::new(projections::equirectangular); 
         //Box::new(projections::sinusoidal);
         //Box::new(|vals| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_4, PI * 12.0f64.recip()));
@@ -68,7 +69,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
  
     
     let bounds = MapBounds::new(
-        &mapping_function, BoundLocation::MaxXandY).add_size(bound)
+        &mapping_function, BoundLocation::Zeros).add_size(bound)
         .to_normal_vals(10.0);
 
     let upper_x = bounds.upper_x;
@@ -98,12 +99,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .map(|point| Circle::new(point.to_tuple(), 2, BLACK.filled())),
     )?;
 
-
     if GEN_INDIC {
-        let area_to_check = 0.4;
-        let threshold = 0.01;
-        let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points,
-            area_to_check, threshold);
+        let area_to_check = 0.02;
+        let indic_radius = 0.1 / 180.0 * PI;  // One tenth of a deg
+        let indic = tissot_indicatrix::gen_indicatrices(Box::new(mapping_function), num_lines, num_points, area_to_check, indic_radius);
         scatter_ctx.draw_series(
             indic.iter()
                 .map(|point| Circle::new(point.to_tuple(), 2, RED.filled()))

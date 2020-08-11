@@ -37,15 +37,16 @@ impl Indicatrix {
 }
 
 
-pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>, num_lines: usize, num_points: usize, area_to_check: f64, threshold: f64) -> Vec<CartPoint> {
+pub fn gen_indicatrices(mapping_function: Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>, num_lines: usize, 
+                        num_points: usize, area_to_check: f64, radius: f64) -> Vec<CartPoint> {
     intersections_of_pars_and_merids(num_lines).iter()
         .map(|p| 
              Circle { 
                  center: *p,
-                 radius: super::INDICATRIX_SIZE,
+                 radius: radius,
                  num_points: num_points,
-             }.to_indicatrix(num_points, area_to_check, threshold).project(&mapping_function)
-             .expand(5.0))
+             }.to_indicatrix(num_points, area_to_check).project(&mapping_function)
+             .expand(75.0))
     .flatten().collect()
 }
 
