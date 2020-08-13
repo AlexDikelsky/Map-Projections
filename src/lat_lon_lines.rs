@@ -1,7 +1,5 @@
 use core::f64::consts::FRAC_PI_2;
-
 use crate::coord_plane::LatLonPoint;
-use crate::coord_plane::CartPoint;
 use crate::one_dim_lines::points_between_exclusive_both_ends;
 use crate::one_dim_lines::points_between_inclusive;
 

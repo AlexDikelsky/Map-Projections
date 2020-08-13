@@ -16,6 +16,7 @@ use coord_plane::CartPoint;
 use coord_plane::LatLonPoint;
 use map_bounds::MapBounds;
 use map_bounds::BoundLocation;
+use projections::*;
 
 const GEN_INDIC: bool = true;
 
@@ -46,20 +47,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //Set mapping function here
     //****************************
     // If the function takes more than one argument, define them before this line
-    let _simple_equidistant_conic = |vals: Vec<LatLonPoint>| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0));
-    let _bonne = |vals: Vec<LatLonPoint>| projections::bonne(vals, FRAC_PI_2);
-    let _mercator = projections::mercator;
-    let _equirectangular = projections::equirectangular;
-    let _sinusoidal = projections::sinusoidal;
-    let _lambert_conformal_conic = |vals: Vec<LatLonPoint>| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_4, PI * 12.0f64.recip());
-    let _stereographic = projections::stereographic;
-    let _loximuthal = |vals: Vec<LatLonPoint>| projections::loximuthal(vals.to_vec(), 0.3 * PI);
+//    let _simple_equidistant_conic = |vals: Vec<LatLonPoint>| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_1 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0));
+    let _bonne = Box::new(|vals: Vec<LatLonPoint>| projections::pseudoconic::bonne(vals, FRAC_PI_4)) as Box<dyn std::ops::Fn(std::vec::Vec<coord_plane::LatLonPoint>) -> std::vec::Vec<coord_plane::CartPoint>>;
+//    let _mercator = projections::mercator;
+//    let _equirectangular = projections::equirectangular;
+//    let _sinusoidal = projections::sinusoidal;
+//    let _lambert_conformal_conic = |vals: Vec<LatLonPoint>| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_3, PI * 12.0f64.recip());
+//    let _stereographic = projections::stereographic;
+//    let _loximuthal = |vals: Vec<LatLonPoint>| projections::loximuthal(vals.to_vec(), -1.3 * PI);
 
-    let fns = [_sinusoidal, _bonne];
+    //let fns = [_sinusoidal, _bonne];
 
-    let mapping_function = Box::new(move |x|
-        _loximuthal(_loximuthal(x).iter().map(|point| point.to_latlon_raw()).collect()))
-        as Box<dyn std::ops::Fn(std::vec::Vec<coord_plane::LatLonPoint>) -> std::vec::Vec<coord_plane::CartPoint>>;
+    let mapping_function = _bonne;
+        
+       // Box::new(move |x|
+       // _loximuthal(_loximuthal(x).iter().map(|point| point.to_latlon_raw()).collect()))
+       // as Box<dyn std::ops::Fn(std::vec::Vec<coord_plane::LatLonPoint>) -> std::vec::Vec<coord_plane::CartPoint>>;
 
     //***
     //Add shapes here to see distortion
