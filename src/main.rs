@@ -16,10 +16,8 @@ use coord_plane::CartPoint;
 use coord_plane::LatLonPoint;
 use map_bounds::MapBounds;
 use map_bounds::BoundLocation;
-use projections::*;
 
 const GEN_INDIC: bool = true;
-
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 

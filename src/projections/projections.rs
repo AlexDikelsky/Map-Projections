@@ -15,14 +15,20 @@ pub enum ProjectionType {
     Arbitrary,
 }
 
-
-pub struct projection {
-    projection_function: Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>,
-    name: String,
-    projection_type: ProjectionType,
+pub enum ProjectionParams {
+    Points(Vec<LatLonPoint>),
+    PointsStandardMerid(Vec<LatLonPoint>, f64)
+    PointsStandardPar(Vec<LatLonPoint>, f64)
+    PointsTwoStandardPar(Vec<LatLonPoint>, f64, f64)
 }
 
 
+
+pub struct Projection {
+    projection_function: Box<dyn Fn(ProjectionParams) -> Vec<CartPoint>>,
+    name: String,
+    projection_type: ProjectionType,
+}
 
 
 pub fn chain_projections<'a>(fns: &'a [&'a Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>]) 
