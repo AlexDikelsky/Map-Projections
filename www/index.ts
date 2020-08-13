@@ -2,9 +2,9 @@
 
 import { Chart } from "projections" 
 
-const canvas = document.getElementById("canvas");
+const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 const coord = document.getElementById("coord");
-const plotType = document.getElementById("plot-type");
+const plotType = <HTMLSelectElement>document.getElementById("plot-type");
 const status = document.getElementById("status");
 
 let chart = null;
@@ -27,7 +27,8 @@ function setupUI() {
 function setupCanvas() {
     const dpr = window.devicePixelRatio || 1;
     const aspectRatio = canvas.width / canvas.height;
-    const size = Math.min(canvas.width, canvas.parentNode.offsetWidth);
+    const parentnode = <HTMLElement>canvas.parentNode;
+    const size = Math.min(canvas.width, parentnode.offsetWidth);
     canvas.style.width = size + "px";
     canvas.style.height = size / aspectRatio + "px";
     canvas.width = size * dpr;
@@ -53,8 +54,8 @@ function updatePlot() {
     chart = null;
     const start = performance.now();
     chart = (selected.value == "mandelbrot")
-        ? Chart.draw(canvas, Number(4))
-        : Chart.draw("canvas", Number(selected.value));
+        ? Chart.power("canvas", Number(4))
+        : Chart.power("canvas", Number(selected.value));
     const end = performance.now();
     status.innerText = `Rendered ${selected.innerText} in ${Math.ceil(end - start)}ms`;
 }
