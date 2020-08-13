@@ -1,9 +1,6 @@
-use super::coord_plane::points_between_exclusive;
-use super::coord_plane::great_circle_dist;
-use super::coord_plane::LatLonPoint;
-use core::f64::consts::PI;
-use core::f64::consts::FRAC_PI_2;
-use core::f64::consts::FRAC_PI_8;
+use crate::one_dim_lines::points_between_exclusive;
+use crate::coord_plane::great_circle_dist;
+use crate::coord_plane::LatLonPoint;
 
 pub struct Circle {
     pub center: LatLonPoint,
@@ -43,16 +40,47 @@ impl Circle {
 
                 let sigma = self.radius;
 
-                dbg!(self.center);
+                let p: Vec<LatLonPoint> = gen_guess_points(self.center, num_points_to_check, area_from_center).iter().filter(
+                |test_point| great_circle_dist(**test_point, self.center) < sigma).map(|x| *x)
+                .collect();
+
+                let abs_diff = |a: f64, b: f64| { (a.abs() - b.abs()).abs() };
+
+                //Max diff is biggest difference in λ from the center that still staisfyes the
+                //equation
+
+                let max_lambda_diff = (&p).iter().fold(0.0, |acc, cur| {
+                    //Find biggest λ difference from center in abs
+                    if abs_diff(self.center.lambda, cur.lambda) > acc { 
+                        abs_diff(self.center.lambda, cur.lambda)
+                    } else {
+                        acc
+                    }
+                });
+
+                let max_phi_diff = (&p).iter().fold(0.0 , |acc, cur| {
+                    if abs_diff(self.center.phi, cur.phi) > acc { 
+                        cur.phi
+                    } else {
+                        acc
+                    }
+                });
+
+                println!("center: {}\n\tfrom_center: {1:.5}\n\tfrom_center: {2:.5}",
+                         self.center,
+                         max_lambda_diff,
+                         max_phi_diff,
+                );
+
+                println!("Used: {}", p.len());
+                println!();
 
                 //Idea is this:
                 //if (rand_point statisfies 
                 //    angle > acos(sin(φ1)sin(φ2) + cos(φ1)cos(φ2)cos(|λ1-λ2|))) {
                 //    add point
                 //}
-                gen_guess_points(self.center, num_points_to_check, area_from_center).iter().filter(
-                |test_point| great_circle_dist(**test_point, self.center) < sigma).map(|x| *x)
-                .collect()
+                p
 
             },
             center: self.center,

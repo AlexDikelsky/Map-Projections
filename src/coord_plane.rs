@@ -1,4 +1,5 @@
 use core::f64::consts::FRAC_PI_2;
+use std::fmt;
 
 #[derive(Copy,Clone,Debug)]
 pub struct LatLonPoint {
@@ -32,6 +33,12 @@ impl CartPoint {
     pub fn to_tuple(&self) -> (f64, f64) {
         (self.x, self.y)
     }
+    pub fn to_latlon_raw(&self) -> LatLonPoint {
+        LatLonPoint {
+            lambda: self.x,
+            phi: self.y,
+        }
+    }
 }
 
 impl LatLonPoint {
@@ -40,14 +47,15 @@ impl LatLonPoint {
     }
 }
 
-
-
-pub fn sphere_coords(num_lines: usize, num_points: usize) -> Vec<LatLonPoint> {
-    merids(num_lines, num_points).iter().copied().chain(
-        pars(num_lines, num_points)).collect()
+impl fmt::Display for LatLonPoint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Lat: {0:.5}, Lon: {1:.5}", self.phi, self.lambda)
+    }
 }
 
-pub fn map_one_point(mapping_fn: &Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>, point: LatLonPoint) -> CartPoint {
+
+
+pub fn map_one_point<'a>(mapping_fn: &'a Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>, point: LatLonPoint) -> CartPoint {
     mapping_fn(vec![point])[0]
 }
 
@@ -64,51 +72,5 @@ pub fn great_circle_dist(start: LatLonPoint, end: LatLonPoint) -> f64 {
     ).acos()
 }
 
-//num points between min and max, exclusive on upper end
-// works with min>max, but goes backward
-pub fn points_between_exclusive(min: f64, max: f64, num: usize) -> Vec<f64> {
-    let inc = (max - min) / (num as f64);
-    (0..num).map(|x| min + ((x as f64) * inc))
-        .collect()
-}
-
-//num points between min and max, inclusive
-pub fn points_between_inclusive(min: f64, max: f64, num: usize) -> Vec<f64> {
-    let inc = (max - min) / ((num-1) as f64);
-    (0..num).map(|x| min + ((x as f64) * inc))
-        .collect()
-}
-
-// Exclude both ends of range
-// useful for excluding extreme lines for tissot's indicatrix
-pub fn points_between_exclusive_both_ends(min: f64, max: f64, num: usize) -> Vec<f64> {
-    let inc = (max - min) / ((num+1) as f64);
-    (0..num).map(|x| inc + min + ((x as f64) * inc))
-        .collect()
-}
 
 
-fn merids(num_merids: usize, num_points: usize) -> Vec<LatLonPoint> {
-    points_between_inclusive(0.0, FRAC_PI_2, num_points)
-        .iter().copied()
-        .map(|x| meridian(x, num_merids)).flatten().collect()
-}
-
-fn pars(num_pars: usize, num_points: usize) -> Vec<LatLonPoint> {
-    merids(num_pars, num_points).iter().map(
-        |point| LatLonPoint {
-            lambda: point.phi,
-            phi: point.lambda,
-        }).collect()
-}
-
-// takes radian degree between 0 and π/2
-// integral num points
-// returns meridian with num points on both "sides"
-fn meridian(deg: f64, num: usize) -> Vec<LatLonPoint> {
-    points_between_inclusive(-(FRAC_PI_2), FRAC_PI_2, num).iter().copied()
-        .map(|x| vec![
-             LatLonPoint { lambda: x, phi: deg },
-             LatLonPoint { lambda: x, phi: deg-(FRAC_PI_2) }])
-    .flatten().collect()
-}

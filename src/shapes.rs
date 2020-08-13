@@ -1,9 +1,4 @@
-use super::coord_plane::points_between_exclusive;
-use super::coord_plane::great_circle_dist;
-use core::f64::consts::PI;
-use core::f64::consts::FRAC_PI_2;
-use core::f64::consts::FRAC_PI_8;
-
+use super::one_dim_lines::points_between_exclusive;
 
 //Takes list of pairs, and draws lines from the first pair to the second, and so on
 //The last pair connects back to the first pair

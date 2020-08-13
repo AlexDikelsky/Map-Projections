@@ -1,5 +1,5 @@
 ## Map Projections
-This is an WIP implementation of many map projections as defined in the book
+This is an implementation of many map projections as defined in the book
 "Flattening the Earth" by John P. Snyder. It uses the 
 [plotters](https://github.com/38/plotters) library to draw new projections
 to the screen. 
@@ -8,7 +8,7 @@ Several example projections are shown below, in addition to more in the
 maps directory. To add your own mapping function, write a new `pub fn`
 in the `projections.rs` file, and call it in `main.rs` where indicated.
 
-You man also add shapes to observe the distortion caused by different projections
+You may also add shapes to observe the distortion caused by different projections
 by adding shapes where marked in the `main.rs` file.
 
 Output from `cargo run` 

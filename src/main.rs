@@ -4,6 +4,8 @@ mod shapes;
 mod circle;
 mod tissot_indicatrix;
 mod map_bounds;
+mod one_dim_lines;
+mod lat_lon_lines;
 
 use plotters::prelude::*;
 
@@ -27,7 +29,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //num_lines changes number of parallels and meridians
     let num_lines = 7;
     //num_points changes how many points are plotted on each meridian
-    let num_points = 1000;
+    let num_points = 100;
     //Size of the graph.
     //set guess_bound to true if you want it to be guessed based off the 
     //bounds of the projection with bound as an extenstion
@@ -35,24 +37,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     //Note that conformal projections will have non-circular indicatrices if
     //the bounds aren't square
-    let bound = 6.0;
+    let bound = 3.0;
 
     //Add parallels and meridians
-    let lat_lon_points: Vec<LatLonPoint> = coord_plane::sphere_coords(num_lines, num_points);
+    let lat_lon_points: Vec<LatLonPoint> = lat_lon_lines::sphere_coords(num_lines, num_points);
 
     //****************************
     //Set mapping function here
     //****************************
     // If the function takes more than one argument, define them before this line
-    let mapping_function: Box<dyn std::ops::Fn(std::vec::Vec<LatLonPoint>) -> std::vec::Vec<CartPoint>> = 
-        //Box::new(|vals| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0)));
-        //Box::new(|vals| projections::bonne(vals, FRAC_PI_2));
-        Box::new(projections::mercator);
-        //Box::new(projections::equirectangular); 
-        //Box::new(projections::sinusoidal);
-        //Box::new(|vals| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_4, PI * 12.0f64.recip()));
-        //Box::new(projections::stereographic);
-        //Box::new(|vals| projections::loximuthal(vals.to_vec(), 0.3 * PI));
+    let _simple_equidistant_conic = |vals: Vec<LatLonPoint>| projections::simple_equidistant_conic(vals.to_vec(), FRAC_PI_2 * (3.0/4.0), FRAC_PI_2 * (1.0/4.0));
+    let _bonne = |vals: Vec<LatLonPoint>| projections::bonne(vals, FRAC_PI_2);
+    let _mercator = projections::mercator;
+    let _equirectangular = projections::equirectangular;
+    let _sinusoidal = projections::sinusoidal;
+    let _lambert_conformal_conic = |vals: Vec<LatLonPoint>| projections::lambert_conformal_conic(vals.to_vec(), FRAC_PI_4, PI * 12.0f64.recip());
+    let _stereographic = projections::stereographic;
+    let _loximuthal = |vals: Vec<LatLonPoint>| projections::loximuthal(vals.to_vec(), 0.3 * PI);
+
+    let fns = [_sinusoidal, _bonne];
+
+    let mapping_function = Box::new(move |x|
+        _loximuthal(_loximuthal(x).iter().map(|point| point.to_latlon_raw()).collect()))
+        as Box<dyn std::ops::Fn(std::vec::Vec<coord_plane::LatLonPoint>) -> std::vec::Vec<coord_plane::CartPoint>>;
 
     //***
     //Add shapes here to see distortion

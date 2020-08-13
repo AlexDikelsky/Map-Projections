@@ -1,6 +1,5 @@
 use core::f64::consts::PI;
 use core::f64::consts::FRAC_PI_2;
-use core::f64::consts::FRAC_PI_4;
 use std::num::FpCategory;
 
 use crate::coord_plane::CartPoint;
