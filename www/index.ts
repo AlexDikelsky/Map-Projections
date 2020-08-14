@@ -1,10 +1,17 @@
 import { Chart } from "projections" 
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
-const coord = document.getElementById("coord");
+
+//Buttons and knobs for projection
 const plotType = <HTMLSelectElement>document.getElementById("plot-type");
 const latLonLines = <HTMLSelectElement>document.getElementById("num-lat-lon");
 const projectButton = <HTMLButtonElement>document.getElementById("project-button");
+const sizeSlider = <HTMLDataElement> document.getElementById("map-size");
+
+//Output of those knobs
+const coord = document.getElementById("coord");
+const mapSizeOutput = document.getElementById("display-map-size");
+
 const status = document.getElementById("status");
 
 let chart = null;
@@ -18,6 +25,10 @@ export function main() {
 /** Add event listeners. */
 function setupUI() {
     status.innerText = "WebAssembly loaded!";
+
+    mapSizeOutput.innerHTML = sizeSlider.value;
+    sizeSlider.oninput = function() { mapSizeOutput.innerHTML = sizeSlider.value };
+
     projectButton.addEventListener("click", updatePlot);
     window.addEventListener("resize", setupCanvas);
     window.addEventListener("mousemove", onMouseMove);
@@ -54,8 +65,9 @@ function updatePlot() {
     status.innerText = `Rendering ${selected_map.innerText}...`;
     chart = null;
 
+    const b = Number(sizeSlider.value)/2.0;
     const bounds: Float64Array =
-	Float64Array.from([2.0, 2.0, -2.0, -2.0]);
+	Float64Array.from([b, b, -b, -b]);
 
     const start = performance.now();
     chart = Chart.project(
@@ -65,9 +77,7 @@ function updatePlot() {
 	false,
 	bounds,
     );
-    //chart = (selected.value == "mandelbrot")
-    //    ? Chart.project("canvas", "mapnamehere", Number(4), false, bounds)
-    //    : Chart.project("canvas", "mapnamehere", Number(selected.value), false, bounds);
+
     const end = performance.now();
     status.innerText = `Rendered ${selected_map.innerText} in ${Math.ceil(end - start)}ms`;
 }

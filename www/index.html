@@ -26,7 +26,7 @@
 		    <option value="mandelbrot">Mandelbrot Set</option>
 		</select>
 
-		<label for="num-lat-lon">Distance between lines: </label>
+		<label for="num-lat-lon">Distance between Lines of Latitude: </label>
 		<select id="num-lat-lon">
 		    <option value="3">60°</option>
 		    <option value="4">45°</option>
@@ -36,6 +36,13 @@
 		</select>
 
 		<button type="button" id="project-button">Project</button>
+
+		<label for="map-size">Map Size: </label>
+		<div class="slidecontainer">
+		    <input type="range" min="1" max="10" value="5" class="slider" id="map-size">
+		</div>
+
+		<span id="display-map-size"></span>
 
 	    </div>
 
