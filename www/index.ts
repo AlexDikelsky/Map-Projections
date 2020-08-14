@@ -1,5 +1,3 @@
-// If you only use `npm` you can simply
-
 import { Chart } from "projections" 
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
@@ -52,10 +50,14 @@ function updatePlot() {
     const selected = plotType.selectedOptions[0];
     status.innerText = `Rendering ${selected.innerText}...`;
     chart = null;
+
+    const bounds: Float64Array =
+	Float64Array.from([2.0, 2.0, -2.0, -2.0]);
+
     const start = performance.now();
     chart = (selected.value == "mandelbrot")
-        ? Chart.power("canvas", Number(4))
-        : Chart.power("canvas", Number(selected.value));
+        ? Chart.project("canvas", "mapnamehere", Number(4), false, bounds)
+        : Chart.project("canvas", "mapnamehere", Number(selected.value), false, bounds);
     const end = performance.now();
     status.innerText = `Rendered ${selected.innerText} in ${Math.ceil(end - start)}ms`;
 }

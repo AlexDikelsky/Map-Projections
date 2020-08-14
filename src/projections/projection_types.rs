@@ -26,9 +26,9 @@ pub enum ProjectionParams {
 
 
 pub struct Projection {
-    projection_function: Box<dyn Fn(ProjectionParams) -> Vec<CartPoint>>,
-    name: String,
-    projection_type: ProjectionType,
+    pub projection_function: Box<dyn Fn(ProjectionParams) -> Vec<CartPoint>>,
+    pub name: String,
+    pub projection_type: ProjectionType,
 }
 
 

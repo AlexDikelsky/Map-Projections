@@ -6,6 +6,8 @@
 //}
 //
 
+use core::f64::consts::PI;
+
 use crate::chart_and_js_exports::DrawResult;
 use plotters::prelude::*;
 use crate::map_bounds::MapBounds;
@@ -13,8 +15,13 @@ use crate::map_bounds::MapBounds;
 use crate::coord_plane::LatLonPoint;
 use crate::lat_lon_lines::sphere_coords;
 
+use crate::projections::projection_by_name;
+use crate::projections::projection_types::ProjectionParams;
+use crate::projections::projection_types::Projection;
 
-pub fn draw(canvas_id: &str, map_projection_name: String, num_lat_lon: usize, tissot: bool, bounds: MapBounds) 
+
+pub fn draw(canvas_id: &str, map_projection_name: String, num_lat_lon: usize, 
+            tissot: bool, bounds: MapBounds) 
     -> DrawResult<impl Fn((i32, i32)) -> Option<(f64, f64)>>
 {
     let backend = CanvasBackend::new(canvas_id).expect("cannot find canvas");
@@ -41,12 +48,24 @@ pub fn draw(canvas_id: &str, map_projection_name: String, num_lat_lon: usize, ti
 
     let points: Vec<LatLonPoint> = sphere_coords(num_lat_lon, 1000);
 
-    let mapped_points = points;
+    let projection: Projection = projection_by_name::use_projection(
+        "Simple Equidistant Conic".to_string())
+        .expect("Projection not found");
+
+    let mapped_points = (projection.projection_function)(
+        ProjectionParams::PointsTwoStandardPar(points, PI * (3.0/4.0), PI * (1.0/4.0)));
         
+    //map_ctx.draw_series(LineSeries::new(
+    //    (-50..=50)
+    //        .map(|x| x as f32 / 50.0)
+    //        .map(|x| (x, -x.powf(8 as f32))),
+    //    &RED,
+    //))?;
 
     map_ctx.draw_series(
-        mapped_points.iter()
-        .map(|point| Circle::new((point.lambda, point.phi), 2, BLACK.filled())),
+        mapped_points
+        .iter()
+        .map(|point| Circle::new(point.to_tuple(), 2, BLACK.filled())),
     )?;
 
     root.present()?;
