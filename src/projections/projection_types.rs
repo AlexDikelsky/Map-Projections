@@ -1,8 +1,8 @@
 use core::f64::consts::FRAC_PI_4;
-use super::coord_plane::PolarPoint;
-use super::coord_plane::LatLonPoint;
-use super::coord_plane::CartPoint;
-use super::coord_plane::great_circle_dist;
+use crate::coord_plane::PolarPoint;
+use crate::coord_plane::LatLonPoint;
+use crate::coord_plane::CartPoint;
+use crate::coord_plane::great_circle_dist;
 
 
 pub enum ProjectionType {
@@ -15,11 +15,12 @@ pub enum ProjectionType {
     Arbitrary,
 }
 
+#[derive(Debug)]
 pub enum ProjectionParams {
     Points(Vec<LatLonPoint>),
-    PointsStandardMerid(Vec<LatLonPoint>, f64)
-    PointsStandardPar(Vec<LatLonPoint>, f64)
-    PointsTwoStandardPar(Vec<LatLonPoint>, f64, f64)
+    PointsStandardMerid(Vec<LatLonPoint>, f64),
+    PointsStandardPar(Vec<LatLonPoint>, f64),
+    PointsTwoStandardPar(Vec<LatLonPoint>, f64, f64),
 }
 
 
@@ -31,17 +32,17 @@ pub struct Projection {
 }
 
 
-pub fn chain_projections<'a>(fns: &'a [&'a Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>]) 
-    -> Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint> + 'a>
-{
-    match fns {
-        [head, tail @ ..] => Box::new(
-            move |x| chain_projections(tail)(head(x).iter().map(|point| {
-                (*point).to_latlon_raw()}).collect()
-                )),
-        [] => Box::new(equirectangular),
-    }
-}
+//pub fn chain_projections<'a>(fns: &'a [&'a Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>]) 
+//    -> Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint> + 'a>
+//{
+//    match fns {
+//        [head, tail @ ..] => Box::new(
+//            move |x| chain_projections(tail)(head(x).iter().map(|point| {
+//                (*point).to_latlon_raw()}).collect()
+//                )),
+//        [] => Box::new(equirectangular),
+//    }
+//}
 
 //This function allows the chaining of previous functions
 //Doesn't necessarily create a reasonable map projection

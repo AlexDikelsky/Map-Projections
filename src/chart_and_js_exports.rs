@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 use super::draw_projection::draw;
+use crate::map_bounds::MapBounds;
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -24,24 +25,19 @@ pub struct Point {
 
 #[wasm_bindgen]
 impl Chart {
-    /// Draw provided power function on the canvas element using it's id.
-    /// Return `Chart` struct suitable for coordinate conversion.
-    /// THIS IS NEW 6:13 8/13/2020
-    pub fn power(canvas_id: &str, power: usize) -> Result<Chart, JsValue> {
-        let map_coord = draw(canvas_id, power).map_err(|err| err.to_string())?;
+    /// Draw selected map projection
+    pub fn project(canvas_id: &str, map_projection_name: String, num_lat_lon: usize,
+                   tissot: bool, bounds: Vec<f64>)
+            -> Result<Chart, JsValue> {
+
+        let map_coord = draw(canvas_id, map_projection_name, num_lat_lon, tissot, 
+                             MapBounds::bounds_from_vec(bounds))
+            .map_err(|err| err.to_string())?;
+
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
     }
-
-    ///// Draw Mandelbrot set on the provided canvas element.
-    ///// Return `Chart` struct suitable for coordinate conversion.
-    //pub fn mandelbrot(canvas: HtmlCanvasElement) -> Result<Chart, JsValue> {
-    //    let map_coord = mandelbrot::draw(canvas).map_err(|err| err.to_string())?;
-    //    Ok(Chart {
-    //        convert: Box::new(map_coord),
-    //    })
-    //}
 
     /// This function can be used to convert screen coordinates to
     /// chart coordinates.

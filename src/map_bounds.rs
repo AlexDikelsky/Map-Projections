@@ -22,6 +22,8 @@ pub enum BoundLocation {
 }
 
 impl MapBounds {
+
+    #[allow(dead_code)]
     pub fn new(mapping_function: &Box<dyn Fn(Vec<LatLonPoint>) -> Vec<CartPoint>>, 
            bound_loc: BoundLocation) -> Self 
     {
@@ -80,6 +82,7 @@ impl MapBounds {
         }
     }
 
+    #[allow(dead_code)]
     pub fn add_size(self, inc: f64) -> Self {
         MapBounds {
             upper_x: self.upper_x + inc,
@@ -89,6 +92,7 @@ impl MapBounds {
         }
     }
 
+    #[allow(dead_code)]
     pub fn to_vec(&self) -> Vec<f64> {
         vec![
             self.upper_x, self.upper_y, 
@@ -96,6 +100,7 @@ impl MapBounds {
         ]
     }
 
+    #[allow(dead_code)]
     pub fn bounds_from_vec(arr: Vec<f64>) -> MapBounds {
         MapBounds {
             upper_x: arr[0],
@@ -106,6 +111,7 @@ impl MapBounds {
     }
 
 
+    #[allow(dead_code)]
     pub fn to_normal_vals(&self, inf_approx: f64) -> MapBounds {
         MapBounds::bounds_from_vec(
             self.to_vec().iter().map(

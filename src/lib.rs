@@ -6,7 +6,7 @@ mod tissot_indicatrix;
 mod map_bounds;
 mod one_dim_lines;
 mod lat_lon_lines;
-mod llib;
+mod chart_and_js_exports;
 mod draw_projection;
 
 use plotters::prelude::*;
@@ -18,8 +18,6 @@ use coord_plane::CartPoint;
 use coord_plane::LatLonPoint;
 use map_bounds::MapBounds;
 use map_bounds::BoundLocation;
-
-const GEN_INDIC: bool = true;
 
 //fn main() -> Result<(), Box<dyn std::error::Error>> {
 //

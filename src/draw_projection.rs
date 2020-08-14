@@ -6,22 +6,15 @@
 //}
 //
 
-use crate::llib::DrawResult;
+use crate::chart_and_js_exports::DrawResult;
 use plotters::prelude::*;
+use crate::map_bounds::MapBounds;
 
 use crate::coord_plane::LatLonPoint;
 use crate::lat_lon_lines::sphere_coords;
 
 
-//Also should take:
-//  tissot (bool)
-//  function to map
-//  bounds to use
-
-
-///These comments may be shown 6:05 CDT
-//#[wasm_bindgen]
-pub fn draw(canvas_id: &str, num_lat_lon: usize) 
+pub fn draw(canvas_id: &str, map_projection_name: String, num_lat_lon: usize, tissot: bool, bounds: MapBounds) 
     -> DrawResult<impl Fn((i32, i32)) -> Option<(f64, f64)>>
 {
     let backend = CanvasBackend::new(canvas_id).expect("cannot find canvas");
@@ -29,13 +22,17 @@ pub fn draw(canvas_id: &str, num_lat_lon: usize)
     let font: FontDesc = ("sans-serif", 20.0).into();
 
     root.fill(&WHITE)?;
+    
+    let upper_x = bounds.upper_x;
+    let lower_x = bounds.lower_x;
+    let upper_y = bounds.upper_y;
+    let lower_y = bounds.lower_y;
 
     let mut map_ctx = ChartBuilder::on(&root)
-        .caption(format!("y=x^{}", 999), font)
+        .caption(format!("{}", map_projection_name), font)
         .x_label_area_size(30)
         .y_label_area_size(30)
-        .build_ranged(-1f64..1f64, -1.2f64..1.2f64)?;
-
+        .build_ranged(lower_x..upper_x, lower_y..upper_y)?;
     map_ctx
         .configure_mesh()
         .disable_x_mesh()

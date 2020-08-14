@@ -33,6 +33,7 @@ fn meridian(deg: f64, num: usize) -> Vec<LatLonPoint> {
     .flatten().collect()
 }
 
+#[allow(dead_code)]
 pub fn intersections_of_pars_and_merids(num_lines: usize) -> Vec<LatLonPoint> {
     points_between_exclusive_both_ends(-FRAC_PI_2, FRAC_PI_2, num_lines).iter()
         .map(|x| points_between_exclusive_both_ends(-FRAC_PI_2, FRAC_PI_2, num_lines).iter()
