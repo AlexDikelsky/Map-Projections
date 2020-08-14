@@ -3,6 +3,8 @@ import { Chart } from "projections"
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 const coord = document.getElementById("coord");
 const plotType = <HTMLSelectElement>document.getElementById("plot-type");
+const latLonLines = <HTMLSelectElement>document.getElementById("num-lat-lon");
+const projectButton = <HTMLButtonElement>document.getElementById("project-button");
 const status = document.getElementById("status");
 
 let chart = null;
@@ -16,7 +18,7 @@ export function main() {
 /** Add event listeners. */
 function setupUI() {
     status.innerText = "WebAssembly loaded!";
-    plotType.addEventListener("change", updatePlot);
+    projectButton.addEventListener("click", updatePlot);
     window.addEventListener("resize", setupCanvas);
     window.addEventListener("mousemove", onMouseMove);
 }
@@ -47,17 +49,25 @@ function onMouseMove(event) {
 
 /** Redraw currently selected plot. */
 function updatePlot() {
-    const selected = plotType.selectedOptions[0];
-    status.innerText = `Rendering ${selected.innerText}...`;
+    const selected_map = plotType.selectedOptions[0];
+    const selected_num_points = latLonLines.selectedOptions[0];
+    status.innerText = `Rendering ${selected_map.innerText}...`;
     chart = null;
 
     const bounds: Float64Array =
 	Float64Array.from([2.0, 2.0, -2.0, -2.0]);
 
     const start = performance.now();
-    chart = (selected.value == "mandelbrot")
-        ? Chart.project("canvas", "mapnamehere", Number(4), false, bounds)
-        : Chart.project("canvas", "mapnamehere", Number(selected.value), false, bounds);
+    chart = Chart.project(
+	"canvas",
+	selected_map.value,
+	Number(selected_num_points.value),
+	false,
+	bounds,
+    );
+    //chart = (selected.value == "mandelbrot")
+    //    ? Chart.project("canvas", "mapnamehere", Number(4), false, bounds)
+    //    : Chart.project("canvas", "mapnamehere", Number(selected.value), false, bounds);
     const end = performance.now();
-    status.innerText = `Rendered ${selected.innerText} in ${Math.ceil(end - start)}ms`;
+    status.innerText = `Rendered ${selected_map.innerText} in ${Math.ceil(end - start)}ms`;
 }

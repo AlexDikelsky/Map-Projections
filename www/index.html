@@ -3,7 +3,7 @@
     <head>
 	<meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Plotters WebAssembly Demo</title>
+	<title>Map Projections</title>
 	<link rel="stylesheet" href="./style.css">
     </head>
     <body>
@@ -15,23 +15,33 @@
             <canvas id="canvas" width="600" height="400"></canvas>
 	    <div id="status">Loading WebAssembly...</div>
 	    <div id="control">
-		<label for="plot-type">Demo: </label>
+		<label for="plot-type">Projection: </label>
 		<select id="plot-type">
-		    <option value="0">Graph of y=1</option>
-		    <option value="1">Graph of y=x</option>
+		    <option value="Simple Equidistant Conic">Simple Equidistant Conic</option>
+		    <option value="Sinusoidal">Sinusoidal</option>
 		    <option value="2">Graph of y=x^2</option>
 		    <option value="3">Graph of y=x^3</option>
 		    <option value="4">Graph of y=x^4</option>
 		    <option value="5">Graph of y=x^5</option>
 		    <option value="mandelbrot">Mandelbrot Set</option>
 		</select>
+
+		<label for="num-lat-lon">Distance between lines: </label>
+		<select id="num-lat-lon">
+		    <option value="3">60°</option>
+		    <option value="4">45°</option>
+		    <option value="6">30°</option>
+		    <option value="12">15°</option>
+		    <option value="18">10°</option>
+		</select>
+
+		<button type="button" id="project-button">Project</button>
+
 	    </div>
+
 	</main>
 	<footer>
-	    <a href="https://github.com/38/plotters/blob/master/examples/wasm-demo" target="a">Source</a> |
-	    <a href="https://github.com/38/plotters" target="a">Repo</a> |
-	    <a href="https://crates.io/crates/plotters" target="a">Crates</a> |
-	    <a href="https://docs.rs/plotters" target="a">Docs</a>
+	    <a href="https://github.com/alexdikelsky/Map-projections" target="a">Repo</a>
 	</footer>
     </body>
 </html>
