@@ -1,33 +1,41 @@
 use core::f64::consts::*;
 use crate::coord_plane::LatLonPoint;
 use crate::coord_plane::CartPoint;
-#[allow(dead_code)]
-pub fn sinusoidal(points: Vec<LatLonPoint>) -> Vec<CartPoint> {
-    points.iter().map(|llpoint|
+use crate::projections::projection_types::ProjectionParams;
+
+pub fn sinusoidal(params: ProjectionParams) -> Vec<CartPoint> {
+    match params {
+        ProjectionParams::PointsOnly(points) => {
+            points.iter().map(|llpoint|
                       CartPoint { 
                           x: llpoint.lambda * llpoint.phi.cos(), 
                           y: llpoint.phi
                       }).collect()
+        },
+        _ => panic!("Invalid parameters {:?} passed in"),
+    }
 }
 
-#[allow(dead_code)]
-pub fn loximuthal(points: Vec<LatLonPoint>, central_lat: f64) -> Vec<CartPoint> {
-    let phi_1 = central_lat;
+pub fn loximuthal(params: ProjectionParams) -> Vec<CartPoint> {
+    match params {
+        ProjectionParams::PointsStandardPar(points, phi_1) => {
+            points.iter().map(|llpoint| {
+                CartPoint { 
+                    x: if llpoint.phi == phi_1 {
+                        //Degenerate case
+                        llpoint.lambda * llpoint.phi.cos()
 
-    points.iter().map(|llpoint| {
-        CartPoint { 
-            x: if llpoint.phi == phi_1 {
-                //Degenerate case
-                llpoint.lambda * llpoint.phi.cos()
-
-            } else {
-                llpoint.lambda * (llpoint.phi-phi_1) / 
-                (
-                    (FRAC_PI_4 + llpoint.phi/2.0).tan().ln() -
-                    (FRAC_PI_4 + phi_1 / 2.0).tan().ln()
-                )
-            },
-            y: llpoint.phi - phi_1,
+                    } else {
+                        llpoint.lambda * (llpoint.phi-phi_1) / 
+                        (
+                            (FRAC_PI_4 + llpoint.phi/2.0).tan().ln() -
+                            (FRAC_PI_4 + phi_1 / 2.0).tan().ln()
+                        )
+                    },
+                    y: llpoint.phi - phi_1,
+                }
+            }).collect()
         }
-    }).collect()
+        _ => panic!("Invalid parameters {:?} passed in"),
+    }
 }

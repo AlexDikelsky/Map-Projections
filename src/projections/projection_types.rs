@@ -1,8 +1,11 @@
+use wasm_bindgen::prelude::*;
 use core::f64::consts::FRAC_PI_4;
 use crate::coord_plane::PolarPoint;
 use crate::coord_plane::LatLonPoint;
 use crate::coord_plane::CartPoint;
 use crate::coord_plane::great_circle_dist;
+
+use crate::chart_and_js_exports::JSProjectionParams;
 
 
 pub enum ProjectionType {
@@ -17,7 +20,7 @@ pub enum ProjectionType {
 
 #[derive(Debug)]
 pub enum ProjectionParams {
-    Points(Vec<LatLonPoint>),
+    PointsOnly(Vec<LatLonPoint>),
     PointsStandardMerid(Vec<LatLonPoint>, f64),
     PointsStandardPar(Vec<LatLonPoint>, f64),
     PointsTwoStandardPar(Vec<LatLonPoint>, f64, f64),
@@ -25,10 +28,12 @@ pub enum ProjectionParams {
 
 
 
+
 pub struct Projection {
     pub projection_function: Box<dyn Fn(ProjectionParams) -> Vec<CartPoint>>,
     pub name: String,
     pub projection_type: ProjectionType,
+    pub params: JSProjectionParams,
 }
 
 

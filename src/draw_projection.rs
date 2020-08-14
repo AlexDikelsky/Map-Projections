@@ -19,9 +19,11 @@ use crate::projections::projection_by_name;
 use crate::projections::projection_types::ProjectionParams;
 use crate::projections::projection_types::Projection;
 
+use crate::chart_and_js_exports::JSProjectionParams;
+
 
 pub fn draw(canvas_id: &str, map_projection_name: String, num_lat_lon: usize, 
-            tissot: bool, bounds: MapBounds) 
+            tissot: bool, bounds: MapBounds, projection_params: Vec<f64>) 
     -> DrawResult<impl Fn((i32, i32)) -> Option<(f64, f64)>>
 {
     let backend = CanvasBackend::new(canvas_id).expect("cannot find canvas");
@@ -49,18 +51,33 @@ pub fn draw(canvas_id: &str, map_projection_name: String, num_lat_lon: usize,
     let points: Vec<LatLonPoint> = sphere_coords(num_lat_lon, 1000);
 
     let projection: Projection = projection_by_name::use_projection(
-        "Simple Equidistant Conic".to_string())
+        map_projection_name.clone())
         .expect("Projection not found");
 
-    let mapped_points = (projection.projection_function)(
-        ProjectionParams::PointsTwoStandardPar(points, PI * (3.0/4.0), PI * (1.0/4.0)));
+    let mapped_points = match projection.params {
+        JSProjectionParams::JSPointsOnly => (projection.projection_function)
+            (ProjectionParams::PointsOnly(points)),
+
+        JSProjectionParams::JSPointsStandardMerid => (projection.projection_function)
+            (ProjectionParams::PointsStandardMerid(points, projection_params[0])),
+
+        JSProjectionParams::JSPointsStandardPar => (projection.projection_function)
+            (ProjectionParams::PointsStandardPar(points, projection_params[0])),
+
+        JSProjectionParams::JSPointsTwoStandardPar => (projection.projection_function)
+            (ProjectionParams::PointsTwoStandardPar(points, projection_params[0],
+                                                    projection_params[1])),
+    };
+
+    //let mapped_points = (projection.projection_function)(
+    //    ProjectionParams::PointsTwoStandardPar(points, PI * (3.0/4.0), PI * (1.0/4.0)));
         
-    //map_ctx.draw_series(LineSeries::new(
-    //    (-50..=50)
-    //        .map(|x| x as f32 / 50.0)
-    //        .map(|x| (x, -x.powf(8 as f32))),
-    //    &RED,
-    //))?;
+    map_ctx.draw_series(LineSeries::new(
+        (-50..=50)
+            .map(|x| x as f64 / 50.0)
+            .map(|x| (x, -x.powf(8 as f64))),
+        &RED,
+    ))?;
 
     map_ctx.draw_series(
         mapped_points

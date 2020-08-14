@@ -15,11 +15,11 @@
             <canvas id="canvas" width="600" height="400"></canvas>
 	    <div id="status">Loading WebAssembly...</div>
 	    <div id="control">
-		<label for="plot-type">Projection: </label>
-		<select id="plot-type">
+		<label for="projection-selector">Projection: </label>
+		<select id="projection-selector">
 		    <option value="Simple Equidistant Conic">Simple Equidistant Conic</option>
 		    <option value="Sinusoidal">Sinusoidal</option>
-		    <option value="2">Graph of y=x^2</option>
+		    <option value="Loximuthal">Loximuthal</option>
 		    <option value="3">Graph of y=x^3</option>
 		    <option value="4">Graph of y=x^4</option>
 		    <option value="5">Graph of y=x^5</option>
@@ -38,11 +38,17 @@
 		<button type="button" id="project-button">Project</button>
 
 		<label for="map-size">Map Size: </label>
-		<div class="slidecontainer">
+		<div>
 		    <input type="range" min="1" max="10" value="5" class="slider" id="map-size">
 		</div>
-
 		<span id="display-map-size"></span>
+
+		<div id="param-holder">
+		    <input type="range" min="-180" max="180" value="0" class="slider" id="first-param-slider">
+		    <input type="range" min="-180" max="180" value="0" class="slider" id="second-param-slider">
+		</div>
+
+
 
 	    </div>
 

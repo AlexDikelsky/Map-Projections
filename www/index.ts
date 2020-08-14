@@ -3,10 +3,21 @@ import { Chart } from "projections"
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 
 //Buttons and knobs for projection
-const plotType = <HTMLSelectElement>document.getElementById("plot-type");
+const mapProjectionSelection = <HTMLSelectElement>document.getElementById("projection-selector");
 const latLonLines = <HTMLSelectElement>document.getElementById("num-lat-lon");
 const projectButton = <HTMLButtonElement>document.getElementById("project-button");
+
+// Sliders for projections
+const paramHolder = document.getElementById("param-holder");
+const firstParamSlider = <HTMLDataElement> document.getElementById("first-param-slider");
+const secondParamSlider = <HTMLDataElement> document.getElementById("second-param-slider");
+const firstParamlabel = document.getElementById("first-param-label");
+const secondParamlabel = document.getElementById("second-param-label");
+
+
+//Sliders for canvas
 const sizeSlider = <HTMLDataElement> document.getElementById("map-size");
+
 
 //Output of those knobs
 const coord = document.getElementById("coord");
@@ -26,8 +37,8 @@ export function main() {
 function setupUI() {
     status.innerText = "WebAssembly loaded!";
 
-    mapSizeOutput.innerHTML = sizeSlider.value;
-    sizeSlider.oninput = function() { mapSizeOutput.innerHTML = sizeSlider.value };
+    mapSizeOutput.innerHTML = sizeSlider.value + " units";
+    sizeSlider.oninput = function() { mapSizeOutput.innerHTML = sizeSlider.value + " units"};
 
     projectButton.addEventListener("click", updatePlot);
     window.addEventListener("resize", setupCanvas);
@@ -60,7 +71,7 @@ function onMouseMove(event) {
 
 /** Redraw currently selected plot. */
 function updatePlot() {
-    const selected_map = plotType.selectedOptions[0];
+    const selected_map = mapProjectionSelection.selectedOptions[0];
     const selected_num_points = latLonLines.selectedOptions[0];
     status.innerText = `Rendering ${selected_map.innerText}...`;
     chart = null;
@@ -69,6 +80,8 @@ function updatePlot() {
     const bounds: Float64Array =
 	Float64Array.from([b, b, -b, -b]);
 
+    const toRadians = function (x) { return x * 3.14159 / 180; }
+
     const start = performance.now();
     chart = Chart.project(
 	"canvas",
@@ -76,6 +89,10 @@ function updatePlot() {
 	Number(selected_num_points.value),
 	false,
 	bounds,
+	Float64Array.from([
+	    toRadians(Number(firstParamSlider.value)),
+	    toRadians(Number(secondParamSlider.value)),
+	]),
     );
 
     const end = performance.now();

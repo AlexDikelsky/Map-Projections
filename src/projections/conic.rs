@@ -2,11 +2,7 @@ use core::f64::consts::*;
 use crate::coord_plane::LatLonPoint;
 use crate::coord_plane::CartPoint;
 use crate::coord_plane::PolarPoint;
-//use crate::projections;
-//super::ProjectionParams;
 
-use crate::map_bounds::MapBounds;
-use crate::projections::projection_types::ProjectionType;
 use crate::projections::projection_types::ProjectionParams;
 
 

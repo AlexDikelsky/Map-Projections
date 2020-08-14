@@ -16,6 +16,17 @@ pub struct Chart {
     convert: Box<dyn Fn((i32, i32)) -> Option<(f64, f64)>>,
 }
 
+
+/// Enum for deciding which sliders for projections should be displayed
+#[wasm_bindgen]
+pub enum JSProjectionParams {
+    JSPointsOnly,
+    JSPointsStandardMerid,
+    JSPointsStandardPar,
+    JSPointsTwoStandardPar,
+}
+
+
 /// Result of screen to chart coordinates conversion.
 #[wasm_bindgen]
 pub struct Point {
@@ -27,17 +38,19 @@ pub struct Point {
 impl Chart {
     /// Draw selected map projection
     pub fn project(canvas_id: &str, map_projection_name: String, num_lat_lon: usize,
-                   tissot: bool, bounds: Vec<f64>)
+                   tissot: bool, bounds: Vec<f64>, projection_params: Vec<f64>)
             -> Result<Chart, JsValue> {
 
         let map_coord = draw(canvas_id, map_projection_name, num_lat_lon, tissot, 
-                             MapBounds::bounds_from_vec(bounds))
+                             MapBounds::bounds_from_vec(bounds), projection_params)
             .map_err(|err| err.to_string())?;
 
         Ok(Chart {
             convert: Box::new(move |coord| map_coord(coord).map(|(x, y)| (x.into(), y.into()))),
         })
     }
+
+    //pub fn params_of(map_projection_name: String) -> 
 
     /// This function can be used to convert screen coordinates to
     /// chart coordinates.
