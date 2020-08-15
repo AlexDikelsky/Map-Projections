@@ -13,4 +13,4 @@ This was created in Rust using Vim. The functions for map projections are as def
 in "Flattening the Earth" by John P. Snyder.
 
 ![Sinusoidal](maps/sinusoidal_with_indicatrices.png)
-![Mercator](maps/mercator_with_indicatrices.png.png)
+![Mercator](maps/mercator_with_indicatrices.png)
