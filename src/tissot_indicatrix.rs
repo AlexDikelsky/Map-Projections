@@ -1,5 +1,4 @@
 use core::f64::consts::FRAC_PI_2;
-use crate::draw_projection::draw;
 use crate::circle::Circle;
 use crate::coord_plane::LatLonPoint;
 use crate::coord_plane::CartPoint;

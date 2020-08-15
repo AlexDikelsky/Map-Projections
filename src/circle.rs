@@ -9,18 +9,6 @@ pub struct Circle {
 }
 
 impl Circle {
-    //This function creates an "indicatrix" that would be correct if distances worked like
-    //they do on a plane. Doesn't actually create an indicatrix.
-    //pub fn to_circlular_points(&self) -> super::tissot_indicatrix::Indicatrix {
-    //    super::tissot_indicatrix::Indicatrix {points: points_between_exclusive(0.0, 2.0 * PI, self.num_points).iter()
-    //        .map(|x|
-    //            (self.center.0 + (self.radius * x.cos()),
-    //             self.center.1 + (self.radius * x.sin())))
-    //            .collect(), 
-    //        center: self.center,
-    //    }
-    //}
-
     // Generates list of points that closer than a certain threshold of distance
     // in spherical distance from a radius point
     // num_points_to_check = 1000

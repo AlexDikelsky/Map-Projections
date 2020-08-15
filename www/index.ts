@@ -40,6 +40,11 @@ function setupUI() {
     mapSizeOutput.innerHTML = sizeSlider.value + " units";
     sizeSlider.oninput = function() { mapSizeOutput.innerHTML = sizeSlider.value + " units"};
 
+    firstParamlabel.innerHTML = firstParamSlider.value + " first param";
+    secondParamlabel.innerHTML = secondParamSlider.value + " second param";
+    firstParamSlider.oninput = function() { firstParamlabel.innerHTML = firstParamSlider.value + " first param"};
+    secondParamSlider.oninput = function() { secondParamlabel.innerHTML = secondParamSlider.value + " second param"};
+
     projectButton.addEventListener("click", updatePlot);
     window.addEventListener("resize", setupCanvas);
     window.addEventListener("mousemove", onMouseMove);
@@ -81,6 +86,7 @@ function updatePlot() {
 	Float64Array.from([b, b, -b, -b]);
 
     const toRadians = function (x) { return x * 3.14159 / 180; }
+
 
     const start = performance.now();
     chart = Chart.project(

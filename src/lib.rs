@@ -9,15 +9,6 @@ mod lat_lon_lines;
 mod chart_and_js_exports;
 mod draw_projection;
 
-use plotters::prelude::*;
-
-use core::f64::consts::PI;
-use core::f64::consts::FRAC_PI_2;
-use core::f64::consts::FRAC_PI_4;
-use coord_plane::CartPoint;
-use coord_plane::LatLonPoint;
-use map_bounds::MapBounds;
-use map_bounds::BoundLocation;
 
 //fn main() -> Result<(), Box<dyn std::error::Error>> {
 //

@@ -1,22 +1,25 @@
-//use core::f64::consts::*;
-use crate::coord_plane::LatLonPoint;
 use crate::coord_plane::CartPoint;
-use crate::coord_plane::PolarPoint;
+use crate::projections::projection_types::ProjectionParams;
 
-#[allow(dead_code)]
-pub fn bonne(points: Vec<LatLonPoint>, central_meridian: f64) -> Vec<CartPoint> {
+pub fn bonne(params: ProjectionParams) -> Vec<CartPoint> {
     //Technically around for a long time before Boone
     //Based off Werner's cordiform projections, which was based off
     //of Ptolemey's second projection
     //
     //Equal area and correct scale along central meridan and parallels
 
-    let phi_1: f64 = central_meridian;
-    let cot_phi_1 = 1.0/(phi_1.tan());
-    points.iter().map(
-        |llpoint| {
-            let rho = cot_phi_1 + phi_1 - llpoint.phi;
-            let theta = llpoint.lambda * (llpoint.phi.cos() / rho);
-            PolarPoint { rho: rho, theta: theta }.to_cart()
-        }).collect()
+    match params {
+        ProjectionParams::PointsStandardPar(points, phi_1) => {
+            points.iter().map(
+                |llpoint| {
+                    let rho = phi_1.tan().recip() + phi_1 - llpoint.phi;
+                    let theta = (llpoint.lambda * llpoint.phi.cos()) / rho;
+                    CartPoint {
+                        x: rho * theta.sin(),
+                        y: phi_1.tan().recip() - rho * theta.cos(),
+                    }
+                }).collect()
+        },
+        _ => panic!("Invalid parameters {:?} passed in"),
+    }
 }

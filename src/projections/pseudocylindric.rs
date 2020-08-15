@@ -1,5 +1,4 @@
 use core::f64::consts::*;
-use crate::coord_plane::LatLonPoint;
 use crate::coord_plane::CartPoint;
 use crate::projections::projection_types::ProjectionParams;
 

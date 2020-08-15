@@ -1,9 +1,5 @@
-use wasm_bindgen::prelude::*;
-use core::f64::consts::FRAC_PI_4;
-use crate::coord_plane::PolarPoint;
 use crate::coord_plane::LatLonPoint;
 use crate::coord_plane::CartPoint;
-use crate::coord_plane::great_circle_dist;
 
 use crate::chart_and_js_exports::JSProjectionParams;
 

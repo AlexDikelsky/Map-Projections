@@ -69,16 +69,6 @@ pub fn draw(canvas_id: &str, map_projection_name: String, num_lat_lon: usize,
                                                     projection_params[1])),
     };
 
-    //let mapped_points = (projection.projection_function)(
-    //    ProjectionParams::PointsTwoStandardPar(points, PI * (3.0/4.0), PI * (1.0/4.0)));
-        
-    map_ctx.draw_series(LineSeries::new(
-        (-50..=50)
-            .map(|x| x as f64 / 50.0)
-            .map(|x| (x, -x.powf(8 as f64))),
-        &RED,
-    ))?;
-
     map_ctx.draw_series(
         mapped_points
         .iter()
